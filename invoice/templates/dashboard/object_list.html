@@ -1,0 +1,79 @@
+
+
+{% extends "dashboard/base.html" %}
+
+
+{% block content %} 
+
+<div class="container">
+  <h2>Listado de {{model_name}}s</h2>
+  <br>
+  <p>Añade, actualiza y elimina {{model_name}}s:</p>   
+
+  <a href="{% url 'product_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir {{model_name}}</a>
+  <br>
+  
+  <table class="table table-striped">
+    <thead>      
+          <tr>    
+            <th>Nombre</th>
+            {% if url_name == "client_detail" %}
+                <th>Correo</th>
+                <th>Telegrono</th> 
+            {% else %}
+              <th>Precio</th>
+              <th>Fabricante</th> 
+            {% endif %}
+            <th>Opciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for object in object_list %}     
+            <tr>
+                <td>{{ object.name }}</td>
+                {% if url_name == "client_detail" %}
+                  <td>{{ object.email }}</td>
+                  <td>{{ object.phone }}</td>
+                {% else %}
+                  <td>{{ object.price }}</td>
+                  <td>{{ object.maker }}</td>
+                {% endif %}
+                <td>
+                  <a class="btn btn-primary" href="{% url url_name object.id %}">Editar</a>
+                  <a class="btn btn-danger" onclick="confirmDelete({{ object.id }})">Eliminar</a>
+                </td>            
+            </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+
+</div>
+
+<script>
+  function confirmDelete(product_id) {
+      Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        {% comment %} Swal.fire(
+          'Deleted!',
+          'Your file has been deleted.',
+          'success'
+        ) {% endcomment %}
+
+         window.location.href="/products/delete/"+ product_id;
+
+      }
+    })
+    }
+</script>
+
+{% endblock content %} 

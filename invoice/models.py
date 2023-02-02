@@ -2,10 +2,10 @@
 
 # Create your models here.
 from django.db import models
+from django.utils import timezone
 from django.db.models import (
     CharField, ForeignKey, DateTimeField, TextField, ManyToManyField)
-import pycountry
-from django.utils import timezone
+
 
 STATUS = [("current", "activa"), ("paid", "pagado"),
           ("unpaid", "sin pagar"), ("expired", "vencida")]

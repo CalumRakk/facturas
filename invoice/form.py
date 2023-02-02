@@ -1,6 +1,6 @@
 
 from django import forms
-from .models import Invoice, Product
+from .models import Invoice, Product,Client
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
@@ -54,4 +54,9 @@ class InvoiceForm(forms.ModelForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model= Product
+        fields = "__all__"
+        
+class ClientForm(forms.ModelForm):
+    class Meta:
+        model= Client
         fields = "__all__"
