@@ -3,19 +3,19 @@
 
 {% extends "dashboard/base.html" %}
 
-
+{% load static %}
 
 {% block content %}
 
 {% load crispy_forms_tags %}    
+    
     {% if model_name == "Client" %}
-        <h1 id="test">Editar Cliente</h1>
+        <h1>Editar Cliente</h1>
     {% elif model_name == "Invoice" %}  
-        <h1 id="test">Editar Factura</h1>
+        <h1>Editar Factura</h1>
     {% else %}
-      <h1 id="test">Editar Producto</h1>
+      <h1>Editar Producto</h1>
     {% endif %}
-
 
     <div class="col-md-5 offset-md-3">
 
@@ -26,4 +26,6 @@
         </form>
 
     </div>
+    <script src="{% static 'ruta/a/tu/archivo.js' %}"></script>
+
 {% endblock content %}

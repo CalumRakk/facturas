@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.db.models import (
     CharField, ForeignKey, DateTimeField, TextField, ManyToManyField)
 
-
 STATUS = [("current", "activa"), ("paid", "pagado"),
           ("unpaid", "sin pagar"), ("expired", "vencida")]
 
@@ -38,11 +37,11 @@ class Invoice(models.Model):
     due_at = DateTimeField(null=False, blank=True,
                            default=timezone.now() + timezone.timedelta(days=7))
     updated_at = DateTimeField(auto_now=True)
-    payment_status = CharField(
+    status = CharField(
         choices=STATUS, default=STATUS[0][1], max_length=100)
     comment = TextField(null=False, blank=True)
     client = ForeignKey(Client, on_delete=models.CASCADE)
-    productos = ManyToManyField(Product)
+    products = ManyToManyField(Product)
 
     def __str__(self) -> str:
         return self.title

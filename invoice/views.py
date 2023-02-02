@@ -1,7 +1,7 @@
 
 # Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
-from .form import InvoiceForm, ProductForm, ClientForm, InvoiceForm
+from .form import InvoiceForm, ProductForm, ClientForm
 from .models import Product, Client, Invoice
 from django.contrib import messages
 
