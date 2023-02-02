@@ -1,0 +1,27 @@
+
+
+
+{% extends "dashboard/base.html" %}
+
+
+
+{% block content %}
+<div class="container">
+  <h2>Dashboard</h2>
+  <p>Crea, edita y administra facturas, productos y clientes:</p>
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link" href="#">Facturas</a>
+    </li>
+    <li class="btnnav-item">
+      <a class="nav-link" href="#">Clientes</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'product_list' %}">Productos</a>
+    </li>
+  </ul>
+</div>
+   
+{% endblock content %}
+
+

@@ -1,0 +1,25 @@
+
+
+
+{% extends "dashboard/base.html" %}
+
+
+
+{% block content %}
+
+{% load crispy_forms_tags %}
+
+<h1>Editar producto</h1>
+
+    {{ msg }}
+    <div class="col-md-5 offset-md-3">
+
+        <form method="post">
+            {% csrf_token  %}
+            {{form|crispy}}
+            <button>Enviar</button>
+        </form>
+
+    </div>
+
+{% endblock content %}
