@@ -1,13 +1,24 @@
 
 # Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
-from .form import InvoiceForm, ProductForm, ClientForm
+from .form import InvoiceForm, ProductForm, ClientForm, InvoiceForm
 from .models import Product, Client
 from django.contrib import messages
 
-
 def index(request):
-    return render(request, "dashboard/dashboard_index.html")
+    pass 
+def invoice_create(request):
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(to="invoice_list")
+    else:
+        form = InvoiceForm()
+        # form.fields['due_at'].widget.attrs['class'] = 'datepicker'
+
+    return render(request, 'dashboard/object_detail.html', {'form': form})
+
 
 
 def invoice_detail(request):

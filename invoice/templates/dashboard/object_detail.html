@@ -8,18 +8,15 @@
 {% block content %}
 
 {% load crispy_forms_tags %}
-
-<h1>Editar producto</h1>
-
+    <h1 id="test">Editar producto</h1>
     {{ msg }}
     <div class="col-md-5 offset-md-3">
 
         <form method="post">
             {% csrf_token  %}
-            {{form|crispy}}
+            {{form|crispy }}
             <button>Enviar</button>
         </form>
 
     </div>
-
 {% endblock content %}
