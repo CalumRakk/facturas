@@ -7,9 +7,16 @@
 
 {% block content %}
 
-{% load crispy_forms_tags %}
-    <h1 id="test">Editar producto</h1>
-    {{ msg }}
+{% load crispy_forms_tags %}    
+    {% if model_name == "Client" %}
+        <h1 id="test">Editar Cliente</h1>
+    {% elif model_name == "Invoice" %}  
+        <h1 id="test">Editar Factura</h1>
+    {% else %}
+      <h1 id="test">Editar Producto</h1>
+    {% endif %}
+
+
     <div class="col-md-5 offset-md-3">
 
         <form method="post">

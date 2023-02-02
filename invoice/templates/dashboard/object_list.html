@@ -9,17 +9,26 @@
   <h2>Listado de {{model_name}}s</h2>
   <br>
   <p>Añade, actualiza y elimina {{model_name}}s:</p>   
-
-  <a href="{% url 'product_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir {{model_name}}</a>
+    {% if model_name == "Client" %}
+        <a href="{% url 'client_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir Cliente</a>
+    {% elif model_name == "Invoice" %}  
+        <a href="{% url 'invoice_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir Factura</a>
+    {% else %}
+      <a href="{% url 'product_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir Producto</a>
+    {% endif %}
+  
   <br>
   
   <table class="table table-striped">
     <thead>      
           <tr>    
             <th>Nombre</th>
-            {% if url_name == "client_detail" %}
+            {% if model_name == "Client" %}
                 <th>Correo</th>
-                <th>Telegrono</th> 
+                <th>Telefono</th> 
+            {% elif model_name == "Invoice" %}  
+                <th>Estado</th>
+                <th>Cliente</th> 
             {% else %}
               <th>Precio</th>
               <th>Fabricante</th> 
@@ -30,17 +39,28 @@
 
     <tbody>
         {% for object in object_list %}     
-            <tr>
-                <td>{{ object.name }}</td>
-                {% if url_name == "client_detail" %}
+            <tr>    
+                {% if model_name == "Client" %}
+                  <td>{{ object.name }}</td>
                   <td>{{ object.email }}</td>
                   <td>{{ object.phone }}</td>
+                {% elif model_name == "Invoice" %} 
+                  <td>{{ object.title }}</td>
+                  <td>{{ object.payment_status }}</td>
+                  <td>{{ object.client.name }}</td> 
                 {% else %}
+                  <td>{{ object.name }}</td>
                   <td>{{ object.price }}</td>
                   <td>{{ object.maker }}</td>
                 {% endif %}
-                <td>
-                  <a class="btn btn-primary" href="{% url url_name object.id %}">Editar</a>
+                <td>                
+                  {% if model_name == "Client" %}
+                    <a class="btn btn-primary" href="{% url 'client_detail' object.id %}">Editar</a>
+                  {% elif model_name == "Invoice" %} 
+                    <a class="btn btn-primary" href="{% url 'invoice_detail' object.id %}">Editar</a>
+                  {% else %}
+                    <a class="btn btn-primary" href="{% url 'product_detail' object.id %}">Editar</a>
+                  {% endif %}
                   <a class="btn btn-danger" onclick="confirmDelete({{ object.id }})">Eliminar</a>
                 </td>            
             </tr>

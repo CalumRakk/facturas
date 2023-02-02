@@ -2,28 +2,11 @@
 # Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
 from .form import InvoiceForm, ProductForm, ClientForm, InvoiceForm
-from .models import Product, Client
+from .models import Product, Client, Invoice
 from django.contrib import messages
 
-def index(request):
-    pass 
-def invoice_create(request):
-    if request.method == 'POST':
-        form = InvoiceForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect(to="invoice_list")
-    else:
-        form = InvoiceForm()
-        # form.fields['due_at'].widget.attrs['class'] = 'datepicker'
-
-    return render(request, 'dashboard/object_detail.html', {'form': form})
-
-
-
-def invoice_detail(request):
-    form = InvoiceForm()
-    return render(request, 'login.html', {'form': form})
+def dashboard_index(request):
+    return render(request, "dashboard/dashboard_index.html") 
 
 # <--- PRODUCT --->
 
@@ -63,15 +46,14 @@ def product_delete(request, object_id):
 
 def product_list(request):
     object_list = Product.objects.all()
-    model_name = "Producto"
-    url_name = "product_detail"
+    model_name = "Product"
 
     context = {
         "model_name": model_name,
-        "url_name": url_name,
         "object_list": object_list
     }
     return render(request, 'dashboard/object_list.html', context)
+
 
 # <---- CLIENTS  ---->
 
@@ -111,12 +93,57 @@ def client_delete(request, client_id):
 
 def client_list(request):
     object_list = Client.objects.all()
-    model_name = "Cliente"       
-    url_name = "client_detail"
+    model_name = "Client"       
 
     context = {
         "model_name": model_name,
-        "url_name": url_name,
         "object_list": object_list
     }
     return render(request, 'dashboard/object_list.html', context)
+
+
+# <---- INVOICES  ---->
+
+def invoice_list(request):
+    object_list = Invoice.objects.all()
+    model_name = "Invoice"
+
+    context = {
+        "model_name": model_name,
+        "object_list": object_list
+    }
+    return render(request, 'dashboard/object_list.html', context)
+
+
+def invoice_create(request):
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(to="invoice_list")
+    else:
+        form = InvoiceForm()
+
+    return render(request, 'dashboard/object_detail.html', {'form': form})
+
+
+def invoice_detail(request, object_id):
+    invoice = get_object_or_404(Invoice, pk=object_id)
+
+    if request.method == "POST":
+        invoice = InvoiceForm(data=request.POST, instance=invoice)
+        if invoice.is_valid():
+            messages.success(request, "El producto ha sido actualizado.")
+            invoice.save()
+            return redirect(to="invoice_list")
+
+    form = InvoiceForm(instance=invoice)
+    return render(request, 'dashboard/object_detail.html', {'form': form})
+
+
+def invoice_delete(request, client_id):
+    invoice = get_object_or_404(Invoice, pk=client_id)
+    messages.success(request, "Se elimino el producto.")
+    invoice.delete()
+    return redirect(to="invoice_list")
+
