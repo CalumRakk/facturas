@@ -4,3 +4,4 @@ django-crispy-forms==1.14.0
 dj-database-url
 psycopg2-binary
 whitenoise[brotli]
+gunicorn
