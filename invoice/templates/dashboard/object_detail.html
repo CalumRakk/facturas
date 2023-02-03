@@ -7,14 +7,13 @@
 
 {% block content %}
 
-{% load crispy_forms_tags %}    
-    
+{% load crispy_forms_tags %}
     {% if model_name == "Client" %}
-        <h1>Editar Cliente</h1>
+        <h1>Editar Clientes</h1>
     {% elif model_name == "Invoice" %}  
-        <h1>Editar Factura</h1>
+        <h1>Editar Facturas</h1>
     {% else %}
-      <h1>Editar Producto</h1>
+      <h1>Editar Productos</h1>
     {% endif %}
 
     <div class="col-md-5 offset-md-3">

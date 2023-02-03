@@ -6,17 +6,21 @@
 {% block content %} 
 
 <div class="container">
-  <h2>Listado de {{model_name}}s</h2>
-  <br>
-  <p>Añade, actualiza y elimina {{model_name}}s:</p>   
-    {% if model_name == "Client" %}
-        <a href="{% url 'client_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir Cliente</a>
-    {% elif model_name == "Invoice" %}  
-        <a href="{% url 'invoice_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir Factura</a>
-    {% else %}
-      <a href="{% url 'product_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir Producto</a>
-    {% endif %}
-  
+  {% if model_name == "Client" %}
+  <h2>Listado de Clientes</h2>
+  <p>Añade, actualiza y elimina {{model_name}}s:</p> 
+  <a href="{% url 'client_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir Cliente</a>
+  {% elif model_name == "Invoice" %}  
+  <h2>Listado de Facturas</h2>
+  <p>Añade, actualiza y elimina {{model_name}}s:</p> 
+  <a href="{% url 'invoice_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir Factura</a>
+  {% else %}
+  <h2>Listado de Productos</h2>
+  <p>Añade, actualiza y elimina {{model_name}}s:</p> 
+  <a href="{% url 'product_create' %}" class="btn btn-outline-primary mb-3" role="button" aria-pressed="true">Añadir Producto</a>
+  {% endif %}
+
+    
   <br>
   
   <table class="table table-striped">

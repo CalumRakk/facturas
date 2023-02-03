@@ -7,7 +7,7 @@ class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
         fields = ("__all__")
-
+    due_at = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type':'datetime-local'}))
 
 class ProductForm(forms.ModelForm):
     class Meta:

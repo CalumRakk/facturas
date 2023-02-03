@@ -5,15 +5,15 @@ from .form import InvoiceForm, ProductForm, ClientForm
 from .models import Product, Client, Invoice
 from django.contrib import messages
 
+
 def dashboard_index(request):
-    return render(request, "dashboard/dashboard_index.html") 
+    return render(request, "dashboard/dashboard_index.html")
 
 # <--- PRODUCT --->
 
 
 def product_detail(request, object_id):
     product = get_object_or_404(Product, pk=object_id)
-
     if request.method == "POST":
         product = ProductForm(data=request.POST, instance=product)
         if product.is_valid():
@@ -21,8 +21,12 @@ def product_detail(request, object_id):
             product.save()
             return redirect(to="product_list")
 
+    context = {
+        'form': form,
+        "model_name": "Product"
+    }
     form = ProductForm(instance=product)
-    return render(request, 'dashboard/object_detail.html', {'form': form})
+    return render(request, 'dashboard/object_detail.html', context)
 
 
 def product_create(request):
@@ -60,16 +64,18 @@ def product_list(request):
 
 def client_detail(request, object_id):
     client = get_object_or_404(Client, pk=object_id)
-
     if request.method == "POST":
         client = ClientForm(data=request.POST, instance=client)
         if client.is_valid():
             messages.success(request, "El producto ha sido actualizado.")
             client.save()
             return redirect(to="client_list")
-
+    context = {
+        'form': form,
+        "model_name": "Client"
+    }
     form = ClientForm(instance=client)
-    return render(request, 'dashboard/object_detail.html', {'form': form})
+    return render(request, 'dashboard/object_detail.html', context)
 
 
 def client_create(request):
@@ -81,7 +87,7 @@ def client_create(request):
     else:
         form = ClientForm()
 
-    return render(request, 'dashboard/object_detail.html', {'form': form})
+    return render(request, 'dashboard/object_detail.html', {'form': form, "model_name":"Client"})
 
 
 def client_delete(request, client_id):
@@ -93,7 +99,7 @@ def client_delete(request, client_id):
 
 def client_list(request):
     object_list = Client.objects.all()
-    model_name = "Client"       
+    model_name = "Client"
 
     context = {
         "model_name": model_name,
@@ -124,7 +130,7 @@ def invoice_create(request):
     else:
         form = InvoiceForm()
 
-    return render(request, 'dashboard/object_detail.html', {'form': form})
+    return render(request, 'dashboard/object_detail.html', {'form': form, "model_name":"Invoice"})
 
 
 def invoice_detail(request, object_id):
@@ -136,9 +142,12 @@ def invoice_detail(request, object_id):
             messages.success(request, "El producto ha sido actualizado.")
             invoice.save()
             return redirect(to="invoice_list")
-
+    context = {
+        'form': form,
+        "model_name": "Invoice"
+    }
     form = InvoiceForm(instance=invoice)
-    return render(request, 'dashboard/object_detail.html', {'form': form})
+    return render(request, 'dashboard/object_detail.html', context)
 
 
 def invoice_delete(request, client_id):
@@ -146,4 +155,3 @@ def invoice_delete(request, client_id):
     messages.success(request, "Se elimino el producto.")
     invoice.delete()
     return redirect(to="invoice_list")
-
