@@ -27,9 +27,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-uc=*p6%4cunll
 # SECURITY WARNING: don't run with debug turned on in production!
 # Cuando añada una variable de entorno llamada 'RENDER' en render.com el modo debug se establece en False.
 
-DEBUG = 'RENDER' not in os.environ
-if not os.path.exists("debug.txt"):
-    DEBUG=True
+DEBUG=True
 
 ALLOWED_HOSTS = []
 
@@ -139,9 +137,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-if not os.path.exists("debug.txt"):
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
