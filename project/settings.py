@@ -25,7 +25,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-uc=*p6%4cunllofv020!23e^@+x8uqu3v@3q#qmo!gwdc#opj8')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG= True
+# Cuando añada una variable de entorno llamada 'RENDER' en render.com el modo debug se establece en False.
+
+DEBUG = 'RENDER' not in os.environ
+if not os.path.exists("debug.txt"):
+    DEBUG=True
 
 ALLOWED_HOSTS = []
 
@@ -135,7 +139,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-if DEBUG is False:
+if not os.path.exists("debug.txt"):
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
