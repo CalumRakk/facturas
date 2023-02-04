@@ -1,0 +1,10 @@
+
+
+.selected {
+    background-color: lightblue;
+  }
+
+tr.item:hover{
+  background-color: lightblue;
+}
+
