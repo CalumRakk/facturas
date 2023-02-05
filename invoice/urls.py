@@ -5,7 +5,7 @@ from invoice import views
 
 
 urlpatterns = [
-    path('login/', views.register_view, name="dashboard_index"),
+    path('singup/', views.signup, name="dashboard_index"),
     path('', views.dashboard_index, name="dashboard_index"),
     
     path('products/', views.product_list, name="product_list"),    

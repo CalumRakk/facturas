@@ -1,7 +1,7 @@
 
 # Create your views here.
 import json
-
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpRequest, JsonResponse
@@ -13,11 +13,11 @@ from django.urls import reverse
 
 from .serializers import InvoiceSerializer
 
-from .models import Product, Client, Invoice
+from .models import Product, Client, Invoice, Product_Sale
 from .form import ProductForm, ClientForm, InvoiceForm
 
 
-def register_view(request: HttpRequest):
+def signup(request: HttpRequest):
     if request.method == 'POST':
         # form = UserCreationForm(request.POST)
         # if form.is_valid():
@@ -42,7 +42,7 @@ def register_view(request: HttpRequest):
 
 
 def dashboard_index(request):
-    return render(request, "dashboard/dashboard_index.html")
+    return render(request, "dashboard/dashboard-index.html")
 
 # <--- PRODUCT --->
 
@@ -87,7 +87,7 @@ def product_delete(request, product_id):
 
 @login_required
 def product_list(request):
-    products = Product.objects.all()
+    products = Product.objects.filter(user_id=request.user.id)
     return render(request, 'dashboard/products.html', {"products": products})
 
 
@@ -158,18 +158,45 @@ def invoice_list(request):
 @login_required
 def invoice_create(request):
     if request.method == 'POST':
-        data = json.loads(request.body.decode("utf-8"))
-        serializer = InvoiceSerializer(data=data)
-        if serializer.is_valid():
-            # TODO: el error de serializer.validate_product_ids no lo estoy manejando. 
-            serializer.validate_product_ids(
-                data["products"], user=request.user)
-            messages.success(request, "Añadido Factura")
-            return JsonResponse({"redirect_url": reverse("invoice_list")})
-        return JsonResponse(serializer.errors)
+        if request.headers.get("X-Requested-Type") == "autocomplete":
+            user = request.user
+            json_data = json.loads(request.body.decode("utf-8"))
+            
+            products = Product.objects.filter(
+                user_id=user.id, name__icontains=json_data["query"])
+            response_json = []
+            for product in products:
+                response_json.append(
+                    {
+                        "name": product.name,
+                        "value": product.name,
+                        "id": product.pk,
+                        "price": product.price,
+                        "maker": product.maker
+                    }
+                )
+            return JsonResponse(response_json, safe=False)
+        # if request.headers.get("X-Requested-Type") == "invoice_create":
+        #     data = json.loads(request.body.decode("utf-8"))
+        #     serializer = InvoiceSerializer(data=data)
+        #     if serializer.is_valid():
+        #         # TODO: el error de serializer.validate_product_ids no lo estoy manejando.
+        #         product_ids= data["products"]
+        #         serializer.validate_product_ids(product_ids, user=request.user)
+
+        #         product_ids = [pk if isinstance(pk, int) else int(pk)
+        #                 for pk in product_ids]
+
+        #         products = Product.objects.filter(pk__in=product_ids, user_id=user.id)
+        #         messages.success(request, "Añadido Factura")
+        #         serializer.save()
+        #         return JsonResponse({"redirect_url": reverse("invoice_list")})
+            
+        #     return JsonResponse(serializer.errors)
     else:
+        clients = Client.objects.filter(user_id=request.user)
         products = Product.objects.filter(user_id=request.user.id)
-        form = InvoiceForm()
+        form = InvoiceForm(clients=clients)
     return render(request, 'dashboard/invoice-create.html', {'form': form, "products": products})
 
 
