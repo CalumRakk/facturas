@@ -23,12 +23,12 @@ def signup(request: HttpRequest):
             password=password)
         user.save()
         login(request, user)
-        return redirect("/")
+        return redirect("invoice:dashboard")
     if request.user.is_authenticated:
-        return redirect('dashboard_index')
+        return redirect("invoice:dashboard")
     form= UserCreationForm
     context = {'form': form}
-    return render(request, 'login.html', context)
+    return render(request, 'signup.html', context)
 
 
 def signin(request: HttpRequest):
@@ -38,16 +38,18 @@ def signin(request: HttpRequest):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("/")
+            return redirect(to="invoice:dashboard")
         
     form = AuthenticationForm()
     context = {'form': form}
-    return render(request, 'login.html', context)
+    return render(request, 'signin.html', context)
 
 
 def dashboard_index(request):
     return render(request, "dashboard/dashboard.html")
 
+def index(request):
+    return render(request, "index.html")
 
 class Client_View(View):
     def get(self, request):

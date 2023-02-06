@@ -10,7 +10,8 @@ urlpatterns = [
     path('signup/', views.signup),
     
     path('login/', views.signin, name="signin"),
-    path('', login_required(views.dashboard_index), name="dashboard_index"),
+    path('', views.index, name="index"),
+    path('dashboard/', login_required(views.dashboard_index), name="dashboard"),
     
     path('clients/<int:client_id>/', login_required(Client_View.as_view()), name='client-detail'),
     path('clients/', login_required(Client_View.as_view()), name='client-detail')
