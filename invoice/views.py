@@ -6,11 +6,18 @@ from django.contrib import messages
 from django.http import HttpRequest, JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.views.generic import View
 
 from .models import Client
 from .form import ClientForm
+
+
+def signout(request: HttpRequest):
+    if request.user.is_authenticated:
+        logout(request)
+        return redirect('/')
+    return redirect('invoice:signin')
 
 
 def signup(request: HttpRequest):
@@ -26,30 +33,32 @@ def signup(request: HttpRequest):
         return redirect("invoice:dashboard")
     if request.user.is_authenticated:
         return redirect("invoice:dashboard")
-    form= UserCreationForm
+    form = UserCreationForm
     context = {'form': form}
     return render(request, 'signup.html', context)
 
 
 def signin(request: HttpRequest):
-    if request.method=="POST":
+    if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             return redirect(to="invoice:dashboard")
-        
+
     form = AuthenticationForm()
     context = {'form': form}
     return render(request, 'signin.html', context)
 
 
-def dashboard_index(request):
+def dashboard(request):
     return render(request, "dashboard/dashboard.html")
+
 
 def index(request):
     return render(request, "index.html")
+
 
 class Client_View(View):
     def get(self, request):

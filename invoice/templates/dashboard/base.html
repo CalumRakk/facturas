@@ -34,7 +34,7 @@
 
     <ul class="sidebar-nav">
       <li class="nav-item">
-        <a class="nav-link " href="/">
+        <a class="nav-link " href="{% url 'invoice:dashboard' %}">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
@@ -107,12 +107,12 @@
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             <img src="{% static 'invoice/img/logo.png' %}" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">C. Antonio</span>
+            <span class="d-none d-md-block dropdown-toggle ps-2">{{ user.username }}</span>
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Carlos Antonio</h6>
+              <h6>{{ user.username }}</h6>
               <span>comerciante</span>
             </li>
             <li>
@@ -130,7 +130,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
+              <a class="dropdown-item d-flex align-items-center" href="{% url 'invoice:signout' %}">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
