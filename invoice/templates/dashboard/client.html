@@ -3,14 +3,9 @@
 {% load static %}
 
 {% block head %}
-<style>
-    .alert-container {
-        position: sticky ;
-        top: 0;
-        right: 0;
-        left: 0;
-    }
-</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="{% static 'invoice/css/messages.css' %}" rel="stylesheet">
 
 
 {% endblock head %}
@@ -18,33 +13,21 @@
 {% block content %}
 
 <main id="main" class="main">
+    <!-- Page Title -->
     <div class="pagetitle">
         <h1>Dashboard</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'invoice:dashboard' %}">Home</a></li>
                 <li class="breadcrumb-item active">Clientes</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
 
-
+    <!-- Container -->
     <div class="container">
-        <!-- {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert"
-                id="alert_{{ forloop.counter }}">
-                {{ message }}
-            </div>
-            {% endfor %}
-            <script>
-                {% for message in messages %}
-                setTimeout(function () {
-                    $("#alert_{{ forloop.counter }}").alert('close');
-                }, 1000);
-            {% endfor %}
-            </script>
-        {% endif %} -->
+
+        <!-- Tabla de Clientes -->
         <div class="table-container">
             <table class="table table-striped">
                 <thead>
@@ -62,7 +45,8 @@
                         <td>{{ client.email }}</td>
                         <td>{{ client.phone }}</td>
                         <td>
-                            {% comment %} <a class="btn btn-primary" href="{% url 'client_detail' object.id %}">Editar</a>
+                            {% comment %} <a class="btn btn-primary"
+                                href="{% url 'client_detail' object.id %}">Editar</a>
                             {% endcomment %}
                             <a class="btn btn-danger open-modal" data-toggle="modal" data-target="#confirm-modal"
                                 data-value="{{ client.id }}">Eliminar</a>
@@ -71,29 +55,27 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div><!-- Fin Tabla de Clientes -->
 
-            <div class="alert-container">
-                {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                {% endfor %}
-                <script>
-                    setTimeout(function () {
-                        $(".alert").alert('close');
-                    }, 5000);
-                </script>
-                {% endif %}
+            <!-- Alertas -->
+        {% if messages %}
+        <div class="container mt-5">
+            {% for message in messages %}       
+            <div class="alert alert-base p-4 alert-{{ message.tags }}">
+               <i class="fa fa-info-circle" aria-hidden="true"></i>
+               <span class="alert-body">
+                 <h6 class="alert-header">{{ message.tags }}</h6>
+                 <p class="mb-0">{{ message }}</p>
+               </span>
             </div>
+            {% endfor %}
         </div>
+        {% endif %}<!-- Fin Alertas -->
 
 
+        <!-- Modal Para Crear Nuevo Cliente -->
         <div class="modal-footer">
-            <!-- Modal Para Crear Nuevo Cliente -->
+
             <button type="button" class="btn btn-secondary " data-bs-toggle="modal"
                 data-bs-target="#crear-client-modal">
                 Crear nuevo Cliente
@@ -136,7 +118,7 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
-
+        <!-- Modal oculto -->
         <div class="modal" tabindex="-1" role="dialog" id="confirm-modal">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -157,8 +139,9 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </div><!-- Fin Modal oculto -->
+    </div><!-- Fin Container -->
+
 </main>
 
 
@@ -167,33 +150,39 @@
 
 {% block script %}
 
-
 <script>
-    $(".open-modal").click(function () {
-        const value = $(this).data("value");
-        $("#confirm-button").data("value", value);
-    });
+    $(document).ready(function () {
 
-    $("#confirm-button").click(function () {
-        const value = $(this).data("value");
-        delete_client(value);
-    });
-
-    function delete_client(object_id) {
-        $.ajax({
-            url: window.location.href,
-            type: "DELETE",
-            data: JSON.stringify({ id: object_id }),
-            headers: {
-                "Content-Type": "application/json; charset=utf-8",
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            dataType: "json",
-            success: function (data) {
-                location.reload();
-            }
+        $(".alert").fadeTo(2000, 1).slideUp(500, function () {
+            $(".alert").alert('close');
         });
-    }
+
+        $(".open-modal").click(function () {
+            const value = $(this).data("value");
+            $("#confirm-button").data("value", value);
+        });
+
+        $("#confirm-button").click(function () {
+            const value = $(this).data("value");
+            delete_client(value);
+        });
+
+        function delete_client(object_id) {
+            $.ajax({
+                url: window.location.href,
+                type: "DELETE",
+                data: JSON.stringify({ id: object_id }),
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                dataType: "json",
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        }
+    });
 </script>
 
 {% endblock script %}

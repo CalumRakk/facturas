@@ -53,6 +53,7 @@ def signin(request: HttpRequest):
 
 
 def dashboard(request):
+    messages.add_message(request,messages.WARNING, "Página por implementar.")
     return render(request, "dashboard/dashboard.html")
 
 
