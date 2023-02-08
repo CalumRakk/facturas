@@ -3,6 +3,7 @@
 import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.messages import constants as message_constants 
 from django.http import HttpRequest, JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -12,6 +13,7 @@ from django.views.generic import View
 from .models import Client
 from .form import ClientForm
 
+message_constants.ERROR= 'danger'
 
 def signout(request: HttpRequest):
     if request.user.is_authenticated:
