@@ -1,10 +1,11 @@
 
 from django.contrib.auth.decorators import login_required
 from django.urls import path
-from invoice import views
-from invoice.views import Transaccion_view, Tramite_view
+from . import views
+from .views import Tramite_view
 
-app_name = 'invoice'
+app_name = 'transactions'
+
 urlpatterns = [
     path('register/', views.signup, name="signup"),
     path('signup/', views.signup),

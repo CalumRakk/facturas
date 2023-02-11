@@ -1,16 +1,16 @@
 
 # Create your views here.
 import json
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.http import HttpRequest, JsonResponse, HttpResponseBadRequest, HttpResponse
+from django.http import HttpRequest, JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.views.generic import View
 from django.urls import reverse
 
-from .models import Transaccion, Tramite, CLASSIFICATION, Derecho
+from .models import Derecho
 from .form import TransaccionForm, TramiteForm
 from .serializers import TramiteSerializer
 
@@ -44,7 +44,7 @@ def signout(request: HttpRequest):
     if request.user.is_authenticated:
         logout(request)
         return redirect('/')
-    return redirect('invoice:signin')
+    return redirect('transactions:signin')
 
 
 def signup(request: HttpRequest):
@@ -57,9 +57,9 @@ def signup(request: HttpRequest):
             password=password)
         user.save()
         login(request, user)
-        return redirect("invoice:dashboard")
+        return redirect("transactions:dashboard")
     if request.user.is_authenticated:
-        return redirect("invoice:dashboard")
+        return redirect("transactions:dashboard")
     form = UserCreationForm
     context = {'form': form}
     return render(request, 'signup.html', context)
@@ -72,7 +72,7 @@ def signin(request: HttpRequest):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect(to="invoice:dashboard")
+            return redirect(to="transactions:dashboard")
 
     form = AuthenticationForm()
     context = {'form': form}
@@ -128,5 +128,5 @@ class Tramite_view(View):
             serializer = TramiteSerializer(data=data["data"])
             if serializer.is_valid():
                 serializer.save()
-                return JsonResponse({"redirect_url": reverse("invoice:tramite")})                   
+                return JsonResponse({"redirect_url": reverse("transactions:tramite")})                   
         return HttpResponseBadRequest("Invalid request")

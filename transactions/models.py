@@ -51,6 +51,8 @@ class Derecho(models.Model):
     classification = models.CharField(max_length=30, choices=CLASSIFICATION)
     percentage = models.DecimalField(max_digits=15, decimal_places=2)
     sale_value = models.DecimalField(max_digits=15, decimal_places=2)
+    def __str__(self):
+        return self.name + ' - ' + self.classification
 
 
 class Tramite(models.Model):
