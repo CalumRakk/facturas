@@ -41,25 +41,11 @@
       </li><!-- End Dashboard Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" href="{% url 'invoice:client-detail' %}">
+        <a class="nav-link collapsed" data-bs-target="#components-nav" href="{% url 'invoice:tramite' %}">
           <i class="bi bi-menu-button-wide"></i>
-          <span>Clientes</span>
+          <span>Crear Tramite</span>
         </a>
       </li><!-- End Components Nav -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" href="#">
-          <i class="bi bi-menu-button-wide"></i>
-          <span>Products</span>
-        </a>
-      </li><!-- End Components Nav -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" href="#">
-          <i class="bi bi-menu-button-wide"></i>
-          <span>Facturas</span>
-        </a>
-      </li><!-- End Components Nav -->
-
-
 
       <li class="nav-heading">Pages</li>
 
@@ -148,15 +134,11 @@
 
   {% endblock content %}
 
-  <!-- Vendor JS Files -->
   <!-- Script -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script> 
+  {% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>  {% endcomment %}
   <script src="{% static 'invoice/lib/bootstrap/js/bootstrap.min.js' %}"></script>
   <script src="{% static 'invoice/lib/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-  <!-- Template Main JS File -->
-  <script src="{% static 'invoice/js/main.js' %}"></script>
-
-
+  
   {% block script %}
   
   {% endblock script %}

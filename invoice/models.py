@@ -4,56 +4,75 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-STATUS = [("current", "activa"), ("paid", "pagado"),
-          ("unpaid", "sin pagar"), ("expired", "vencida")]
+
+CLASSIFICATION = [
+    ('automobile', 'automóvil'),
+    ('motorcycle', 'moto')
+]
+STATUS_CHOICES = [
+    ('pending', 'Pending'),
+    ('approved', 'Approved'),
+]
+
+NATIONAL_REGISTRY = [
+    ("rna", "RNA"), ("rnc", "RNC")
+]
 
 
-class Client(models.Model):
+class Vehiculo(models.Model):
+    vehicle_type = models.CharField(max_length=100)
+    license_plate = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.vehicle_type + ' - ' + self.license_plate
+
+
+class Cliente(models.Model):
     name = models.CharField(max_length=100)
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    last_name = models.CharField(max_length=100)
+    document_type = models.CharField(max_length=100)
+    document_number = models.CharField(max_length=100)
+    phone = models.CharField(max_length=100)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __str__(self) -> str:
-        return self.name
+    def __str__(self):
+        return self.name + ' ' + self.last_name
 
 
-class Product(models.Model):
+class Asesor(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    maker = models.CharField(max_length=100)
+    employee_number = models.CharField(max_length=100)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    def __str__(self) -> str:
-        return f"{self.pk} {self.name}"
+    def __str__(self):
+        return self.name + ' - ' + self.employee_number
 
-class Invoice(models.Model):
-    iva = models.IntegerField(default=16)
-    subtotal = models.DecimalField(
-        default=0.00, decimal_places=2, max_digits=8)
-    total = models.DecimalField(default=0.00, decimal_places=2, max_digits=8)
-    due_at = models.DateTimeField(null=False, blank=True,
-                                  default=timezone.now() + timezone.timedelta(days=7))
 
-    status = models.CharField(
-        choices=STATUS, default=STATUS[0][1], max_length=100)
-    updated_at = models.DateTimeField(auto_now=True)
-    comment = models.TextField(null=False, blank=True)
+class Derecho(models.Model):
+    name = models.CharField(max_length=100)
+    classification = models.CharField(max_length=30, choices=CLASSIFICATION)
+    percentage = models.DecimalField(max_digits=15, decimal_places=2)
+    sale_value = models.DecimalField(max_digits=15, decimal_places=2)
 
+
+class Tramite(models.Model):
+    name = models.CharField(max_length=100)
+    national_register = models.CharField(choices=NATIONAL_REGISTRY, max_length=30)
+    classification = models.CharField(choices=CLASSIFICATION, max_length=30)
+    derechos = models.ManyToManyField(Derecho)
+    vigencia = models.DateTimeField()
+
+
+class Transaccion(models.Model):
+    assessor = models.ForeignKey(Asesor, on_delete=models.CASCADE)
     creation_at = models.DateTimeField(auto_now_add=True)
+    client = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
+    tramite = models.ForeignKey(Tramite, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='pending',
+    )
+    comment = models.TextField()
 
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-
-
-class Product_Sale(models.Model):
-    count_sale = models.IntegerField(default=0)
-    price = models.DecimalField(default=0.00, decimal_places=2, max_digits=8)
-    subtotal = models.DecimalField(
-        default=0.00, decimal_places=2, max_digits=8)
-
-    sale = models.ForeignKey(Invoice, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.status

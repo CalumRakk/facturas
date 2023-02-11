@@ -1,0 +1,118 @@
+{% load static %}
+
+<head>
+    <link href="{% static 'invoice/lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'invoice/lib/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+
+</head>
+
+
+{{ form.classification }}
+<main id="main" class="main">
+    <div class="container">
+        <div class="row col-xl-9 mx-auto">
+            <h4 class="mb-3 p-8">Tramite</h4>
+            <form method="post">
+                {% csrf_token %}
+                {% comment %} <div class="row">
+                    <div class="form-group col-md-5  mb-2 ">
+                        {{ form.derechos }}
+                        <small style="display: none;" id="derechoHelper" class="form-text text-muted">Resultados filtrados por {{ form.classification.label | lower }}</small>
+                    </div>
+                    <div class="row">
+                        <div id="derechos">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nombre</th>
+                                        <th>Tipo de Vehiculo</th>
+                                        <th>Porcentaje</th>
+                                        <th>Valor de Venta</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="list">
+                                    <tr>
+                                        <td class="id"></td>
+                                        <td class="name"></td>
+                                        <td class="classification"></td>
+                                        <td class="percentage"></td>
+                                        <td class="sale_value"></td>
+                                        <td class="remove">
+                                            <button class="remove-item-btn">X</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+                {{form }}
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Procesar</button> 
+            </form>
+        </div>
+    </div>
+</main>
+<script>
+    $(function () {
+        var options = {
+            valueNames: ['id', 'name', 'classification', "percentage", "sale_value"]
+        };
+        var derechos = new List('derechos', options);
+        derechos.clear();
+        removeBtns_selector_name = ".remove-item-btn"
+
+
+        
+        $( "#id_derechos" ).mouseover(function() {
+            $( "#derechoHelper" ).show();
+        });
+        $("#id_derechos" ).mouseout(function() {
+            $( "#derechoHelper" ).hide();
+        });
+         
+
+        function add_derecho(data) {
+            derechos.add(data);
+            refreshCallbacks();
+        };
+        function refreshCallbacks() {
+            removeBtns = $(removeBtns_selector_name);
+
+            removeBtns.click(function () {
+                var itemId = $(this).closest('tr').find('.id').text();
+                derechos.remove('id', itemId);
+            });
+        };
+        {% comment %} $('#id_derechos').autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: window.location.href,
+                    type: "POST",
+                    data: JSON.stringify({ query: request.term, classification: $("#id_classification").val() }),
+                    headers: {
+                        "X-Requested-Type": "autocomplete",
+                        "Content-Type": "application/json; charset=utf-8",
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        response(data)
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                add_derecho(ui.item)
+            },
+            close: function (event, ui) {
+                $(this).val("");
+            }
+        }); {% endcomment %}
+    });
+</script>
