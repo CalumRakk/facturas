@@ -15,8 +15,8 @@ from .models import Derecho, Tramite
 from .form import TransaccionForm, TramiteForm
 from .serializers import TramiteSerializer
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.decorators import api_view
+
 
 @api_view(('GET',))
 def tramites_endpoint(request):
@@ -25,7 +25,7 @@ def tramites_endpoint(request):
     offset = (page - 1) * limit
     tramites = Tramite.objects.all()[offset:offset + limit]
     serializer = TramiteSerializer(tramites, many=True)
-    data = {'data': serializer.data}
+    data = {'tramites': serializer.data}
     return Response(data, template_name="test.html")
 
 def test(request):
