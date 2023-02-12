@@ -4,7 +4,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-
+from django.core import serializers
+import json 
 CLASSIFICATION = [
     ('automobile', 'automóvil'),
     ('motorcycle', 'moto')
@@ -51,16 +52,28 @@ class Derecho(models.Model):
     classification = models.CharField(max_length=30, choices=CLASSIFICATION)
     percentage = models.DecimalField(max_digits=15, decimal_places=2)
     sale_value = models.DecimalField(max_digits=15, decimal_places=2)
+
     def __str__(self):
         return self.name + ' - ' + self.classification
 
 
 class Tramite(models.Model):
     name = models.CharField(max_length=100)
-    national_register = models.CharField(choices=NATIONAL_REGISTRY, max_length=30)
+    national_register = models.CharField(
+        choices=NATIONAL_REGISTRY, max_length=30)
     classification = models.CharField(choices=CLASSIFICATION, max_length=30)
     derechos = models.ManyToManyField(Derecho)
     vigencia = models.DateTimeField()
+
+    def __str__(self):
+        return self.name + ' - ' + self.classification
+
+    def to_json(self):
+        derechos= self.derechos
+        data = serializers.serialize('json', [self])
+        json_data = json.loads(data)[0]["fields"]
+        json_data.update({"value": f"{self.name} - {self.classification}" })
+        return json_data
 
 
 class Transaccion(models.Model):

@@ -9,13 +9,30 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.views.generic import View
 from django.urls import reverse
+from rest_framework.decorators import api_view
 
-from .models import Derecho
+from .models import Derecho, Tramite
 from .form import TransaccionForm, TramiteForm
 from .serializers import TramiteSerializer
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 
+@api_view(('GET',))
+def tramites_endpoint(request):
+    limit = int(request.GET.get('limit', 100))
+    page = int(request.GET.get('page', 1))
+    offset = (page - 1) * limit
+    tramites = Tramite.objects.all()[offset:offset + limit]
+    serializer = TramiteSerializer(tramites, many=True)
+    data = {'data': serializer.data}
+    return Response(data, template_name="test.html")
 
 def test(request):
+    if request.headers.get("X-Requested-Type") == "get":
+        # FIXME: Si se crean muchos tramites se estarian devolviendo todos los de la base de datos. Limitar esto.
+        tramites= Tramite.objects.all()
+        return JsonResponse({"data":[tramite.to_json() for tramite in tramites]}, safe=False)
     if request.method == "POST":
         if request.headers.get("X-Requested-Type") == "autocomplete":
             json_data = json.loads(request.body.decode("utf-8"))

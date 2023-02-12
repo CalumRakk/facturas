@@ -1,28 +1,107 @@
+{% extends "dashboard/base.html" %}
+
 {% load static %}
 
-<head>
-    <link href="{% static 'transactions/lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'transactions/lib/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
-
-</head>
+{% block head %}
 
 
-{{ form.classification }}
+{% endblock head %}
+
+{% block content %}
 <main id="main" class="main">
+    <!-- Page Title -->
+    <div class="pagetitle">
+        <h1>Dashboard</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'transactions:dashboard' %}">Home</a></li>
+                <li class="breadcrumb-item active">Clientes</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <!-- Container -->
     <div class="container">
         <div class="row col-xl-9 mx-auto">
-            <h4 class="mb-3 p-8">Tramite</h4>
-            <form method="post">
+            <h4 class="mb-3">Tramites</h4>
+            <div id="tramites">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Registro Nacional</th>
+                            <th>Clasificación</th>
+                            <th>Derechos</th>
+                            <th>Vigencia</th>
+                        </tr>
+                    </thead>
+                    <tbody class="list">
+                        <tr>
+                            <td class="id"></td>
+                            <td class="name"></td>
+                            <td class="classification"></td>
+                            <td class="percentage"></td>
+                            <td class="sale_value"></td>
+                            <td class="remove">
+                                <button class="remove-item-btn">X</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
+            <form class="needs-validation" method="post" style="display:none">
                 {% csrf_token %}
-                {% comment %} <div class="row">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.name.label_tag }}
+                        {{ form.name }}
+                        <div class="invalid-feedback">
+                            Este campo es requerido.
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3 form-group">
+                        <label for="registro_nacional">Registro nacional</label>
+                        {{ form.national_register }}
+
+                        <div class="invalid-feedback">
+                            Por favor, selecciona un {{ form.national_register.label|lower }}.
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4 form-group">
+                        {{ form.classification.label_tag }}
+
+                        {{ form.classification }}
+
+                        <div class="invalid-feedback">
+                            Por favor, selecciona un {{ form.classification.label }}.
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.vigencia.label_tag }}
+                        {{ form.vigencia }}
+                    </div>
+                </div>
+                <hr class="mb-4">
+
+                <div class="row">
                     <div class="form-group col-md-5  mb-2 ">
+                        <input type="text" id="search_input_id" class="table form-control"
+                            placeholder="Buscar derecho...">
+
                         {{ form.derechos }}
-                        <small style="display: none;" id="derechoHelper" class="form-text text-muted">Resultados filtrados por {{ form.classification.label | lower }}</small>
+                        <small style="display: none;" id="derechoHelper" class="form-text text-muted">Resultados
+                            serán filtrados por {{ form.classification.label | lower }}</small>
                     </div>
                     <div class="row">
                         <div id="derechos">
@@ -51,54 +130,172 @@
                             </table>
                         </div>
                     </div>
-                </div> {% endcomment %}
-                {{form }}
-                <button class="btn btn-primary btn-lg btn-block" type="submit">Procesar</button> 
+                </div>
+                <hr class="mb-4">
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Procesar</button>
             </form>
+
         </div>
-    </div>
+
+
+    </div><!-- Fin Container -->
+
+
 </main>
+
+<!-- Archivos JavaScript de Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+
+{% endblock content %}
+
+{% block script %}
+
 <script>
     $(function () {
         var options = {
             valueNames: ['id', 'name', 'classification', "percentage", "sale_value"]
         };
+
+        $.ajax({
+            type: 'GET',
+            url: window.location.href,
+            dataType: 'json',
+            headers: {
+                "X-Requested-Type": "get"
+            },
+            success: function (data) {
+                // Crea una nueva instancia de List.js para la tabla
+                const tramites_options = {
+                    valueNames: ['id', 'name', 'national_register', 'classification', 'derechos', 'vigencia']
+                };
+
+                var tramites = new List('tramites', tramites_options);
+
+                // Agrega cada objeto de datos como una nueva fila en la tabla
+                data.forEach(function (item) {
+                    tramites.add({
+                        id: item.id,
+                        name: item.name,
+                        national_register: item.national_register,
+                        classification: item.classification,
+                        derechos: item.derechos,
+                        vigencia: item.vigencia
+                    });
+                });
+            }
+        });
+
+
+
+
         var derechos = new List('derechos', options);
         derechos.clear();
         removeBtns_selector_name = ".remove-item-btn"
 
 
-        
-        $( "#id_derechos" ).mouseover(function() {
-            $( "#derechoHelper" ).show();
+        classification_select_id = "#id_classification"
+        search_input_id = "#search_input_id" // elementi input para buscar derechos,
+        derechos_input_id = "#id_derechos" // elemento select oculto.
+        searchHelper_small_id = "#derechoHelper" // elemento small oculto y se vuelve visible al pasar en mouse sobre el campo para buscar.
+
+        CSRFToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+        derechos_table_id = "#id_derechos"
+
+
+        $(search_input_id).mouseover(function () {
+            $(searchHelper_small_id).show();
         });
-        $("#id_derechos" ).mouseout(function() {
-            $( "#derechoHelper" ).hide();
-        });
-         
 
         function add_derecho(data) {
             derechos.add(data);
             refreshCallbacks();
+            // update_derechos_input()
         };
+        // function update_derechos_input() {
+        //     // items = derechos.toJSON()
+        //     // data = items.map(function (item) { return item.id.toString() })
+        //     // $(derechos_input_id).val(JSON.stringify(data));
+
+        //     $(derechos_input_id).empty();          
+        //     items = derechos.toJSON()
+        //     $.each(items, function(index, item) {
+        //         const name = item.name;
+        //         const id = item.id;
+        //         var newOption = $("<option>").val(id).text(name).prop("selected", true);
+        //         $(derechos_input_id).append(newOption);
+        //     });
+
+        // if (items.length > 0) {
+        //     $(search_input_id).prop("required", false);
+        // } else {
+        //     prop("required", true)
+        // }
+
+        // }
+        function get_all_data() {
+            items = derechos.toJSON()
+            derechos = items.map(function (item) { return item.id })
+            data = {
+                name: $("#id_name").val(),
+                national_register: $("#id_national_register").val(),
+                classification: $("#id_classification").val(),
+                vigencia: $("#id_vigencia").val(),
+                derechos: derechos
+            }
+            return data
+        }
+        $("form").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: window.location.href,
+                type: "POST",
+                data: JSON.stringify({ data: get_all_data() }),
+                headers: {
+                    "X-Requested-Type": "post",
+                    "Content-Type": "application/json; charset=utf-8",
+                    'X-CSRFToken': CSRFToken
+                },
+                dataType: "json",
+                success: function (data) {
+                    window.location.href = data.redirect_url;
+                }
+            });
+
+        });
         function refreshCallbacks() {
             removeBtns = $(removeBtns_selector_name);
 
             removeBtns.click(function () {
                 var itemId = $(this).closest('tr').find('.id').text();
                 derechos.remove('id', itemId);
+                // update_derechos_input()
             });
         };
-        {% comment %} $('#id_derechos').autocomplete({
+
+        $(search_input_id).autocomplete({
             source: function (request, response) {
                 $.ajax({
                     url: window.location.href,
                     type: "POST",
-                    data: JSON.stringify({ query: request.term, classification: $("#id_classification").val() }),
+                    data: JSON.stringify({ query: request.term, classification: $(classification_select_id).val() }),
                     headers: {
                         "X-Requested-Type": "autocomplete",
                         "Content-Type": "application/json; charset=utf-8",
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        'X-CSRFToken': CSRFToken
                     },
                     dataType: "json",
                     success: function (data) {
@@ -113,6 +310,9 @@
             close: function (event, ui) {
                 $(this).val("");
             }
-        }); {% endcomment %}
+        });
+
     });
 </script>
+
+{% endblock script %}
