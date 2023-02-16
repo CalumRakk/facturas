@@ -84,7 +84,7 @@ class TramiteDerecho(models.Model):
 
 
 class Transaccion(models.Model):
-    client = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     creation_at = models.DateTimeField(auto_now_add=True)
     vehicle = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
     tramite = models.ForeignKey(Tramite, on_delete=models.CASCADE)

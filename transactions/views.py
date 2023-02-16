@@ -20,17 +20,19 @@ def test(request):
     if request.method == "GET":
         form = TransaccionForm()
         return render(request, 'test.html', {"form": form})
-    
+
     elif request.headers.get("X-Requested-Type") == "autocomplete":
         json_data = json.loads(request.body.decode("utf-8"))
-        key_name= "query"
+        key_name = "query"
         if json_data.get(key_name) and json_data[key_name].isnumeric():
-            queryset  = Cliente.objects.filter(document_number=json_data["query"])
+            queryset = Cliente.objects.filter(
+                document_number=json_data["query"])
             serializer = ClienteSerializer(queryset, many=True)
             return JsonResponse(serializer.data, safe=False)
-        
         return JsonResponse([], safe=False)
-        
+
+    elif "button-transaccion" in request.POST:
+        pass
     elif "pre-select" in request.POST:
         registro_nacional = request.POST.get('national_register')
         tipo_vehiculo = request.POST.get('classification')
@@ -46,29 +48,6 @@ def test(request):
         form.fields['national_register'].widget.attrs['disabled'] = True
         form.fields['classification'].widget.attrs['disabled'] = True
         return render(request, 'test-2.html', {"form": form})
-
-    # if request.method == "POST":
-    #     if request.headers.get("X-Requested-Type") == "autocomplete":
-    #         json_data = json.loads(request.body.decode("utf-8"))
-
-    #         products = Derecho.objects.filter(
-    #             classification__icontains=json_data["classification"])
-    #         response_json = []
-    #         for product in products:
-    #             response_json.append(
-    #                 {
-    #                     "id": product.pk,
-    #                     "value": f"{product.name} - ${product.sale_value}",
-    #                     "name": product.name,
-    #                     "classification": product.classification,
-    #                     "percentage": round(product.percentage),
-    #                     "sale_value": product.sale_value
-    #                 }
-    #             )
-    #         return JsonResponse(response_json, safe=False)
-
-    # form = TramiteForm()
-    # return render(request, "test.html", {"form": form})
 
 
 def signout(request: HttpRequest):

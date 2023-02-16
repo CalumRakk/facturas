@@ -3,12 +3,37 @@
 {% load static %}
 
 
-<!-- 
-{% block head %}
 
-{% endblock head %} -->
+{% block head %}
+<style>
+    .container {
+        max-width: 960px;
+    }
+
+    .border-top {
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .border-bottom {
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .border-top-gray {
+        border-top-color: #adb5bd;
+    }
+
+    .box-shadow {
+        box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+    }
+
+    .lh-condensed {
+        line-height: 1.25;
+    }
+</style>
+{% endblock head %}
 
 {% block content %}
+
 <main id="main" class="main">
     <!-- Page Title -->
     <div class="pagetitle">
@@ -21,15 +46,61 @@
         </nav>
     </div><!-- End Page Title -->
 
-    <!-- Container -->
     <div class="container">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 offset-md-3">
-                    <input type="text" id="input-search-cliente" name="query" placeholder="Search"
-                        title="Enter search keyword">
-                    <button type="submit" title="Search" id="button-search-cliente"><i
-                            class="bi bi-search"></i>Buscar</button>
+        <div class="row">
+
+            {% csrf_token %}
+            <div class="col-md-4 order-md-2 mb-4">
+                <form method="post">
+                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Tu Transacción</span>
+                        <span class="badge badge-secondary badge-pill">3</span>
+                    </h4>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0">Cliente</h6>
+                                <small class="form-control-plaintext text-muted" id="client-name-container">Brief
+                                    description</small>
+
+                                <input class="form-control-plaintext text-muted" type="hidden"
+                                    name="{{ form.cliente.name }}" id="{{ form.cliente.id_for_label }}" value="tes"
+                                    readonly>
+
+                            </div>
+                        </li>
+
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0"> {{ form.national_register.label }}</h6>
+                                <input class="form-control-plaintext text-muted" type="text"
+                                    value="{{ form.national_register.value | upper }}" readonly>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0"> {{ form.classification.label }}</h6>
+                                <input class="form-control-plaintext text-muted" name="{{ form.classification.name }}"
+                                    type="text" value="{{ form.classification.value | upper }}" readonly>
+
+                            </div>
+
+                        </li>
+                    </ul>
+                </form>
+            </div>
+
+
+            <div class="col-md-8 order-md-1">
+                <h4 class="mb-3">Cliente</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <input type="search" id="input-search-cliente" name="query" placeholder="N.documento "
+                            title="Buscar Cliente">
+                        <button title="Search" id="button-search-cliente"><i class="bi bi-search"></i>Buscar</button>
+                    </div>
+                </div>
+                <div class="row">
                     <table class="table">
                         <thead>
                             <tr>
@@ -41,33 +112,25 @@
                         <tbody>
                         </tbody>
                     </table>
-
-
-                    <form method="post">
-                        {% csrf_token %}
-
-                        <div class="form-group">
-                            {{ form.national_register.label_tag }}
-                            {{ form.national_register }}
-                        </div>
-
-                        <div class="form-group">
-                            {{ form.national_register.label_tag }}
-                            {{ form.national_register }}
-                        </div>
-
-                        <div class="form-group">
-                            {{ form.classification.label_tag }}
-                            {{ form.classification }}
-                        </div>
-                        <button type="submit" name="tramite" class="btn btn-primary">Guardar</button>
-                    </form>
                 </div>
+
+
+                <hr class="mb-4">
+
+                <h4 class="mb-3">Tramite</h4>
+
+                {{ form.tramite }}
+                <hr class="mb-4">
+
+                <button name="button-transaccion" class="btn btn-primary btn-lg btn-block" type="submit">Continue to
+                    checkout</button>
             </div>
         </div>
 
-    </div><!-- Fin Container -->
+    </div>
 </main>
+
+
 
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
@@ -78,6 +141,7 @@
 <script>
     var inputSearch_id = "#input-search-cliente"
     var btnSearch_id = "#button-search-cliente"
+    var smallClientNameContainer = "#client-name-container"
 
     const object_message = {
         class_name: "45522145",
@@ -137,8 +201,8 @@
                         <td class='name'>${element.name}</td>
                         <td class'document_number'>${element.document_number}</td> 
                         <td>
-                            <button class="edit-item-btn">Edit</button>
-                            <button class="remove-item-btn">Remove</button>
+                            <button class="vincular-btn">Vincular</button>
+                            <button class="desvincular-btn">Desvincular</button>
                         </td>
                     </tr>
                     
@@ -146,11 +210,23 @@
                     $("table").append(new_row);
 
                     if (index === data.length - 1) {
-                        removeBtns = $(".remove-item-btn");
-                        removeBtns.click(function () {
-                            var tr_element = $(this).closest('tr')
-                            tr_element.remove()
+
+                        vincularBtns = $(".vincular-btn");
+                        vincularBtns.click(function () {
+                            const tr_element = $(this).closest('tr');
+                            const tr_id = tr_element.attr("id");
+                            const td_name = $(this).closest('tr').find('.name').text();
+                            console.log(tr_id, td_name);
+                            $(smallClientNameContainer).text(td_name);
+                            $(smallClientNameContainer).next().val(tr_id)
                         });
+
+                        desvincularBtns = $(".desvincular-btn");
+                        desvincularBtns.click(function () {
+                            $(smallClientNameContainer).empty();
+                            $(smallClientNameContainer).next().val("")
+                        });
+
                     }
                 });
             },
