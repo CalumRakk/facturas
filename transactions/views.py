@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.http import HttpRequest, JsonResponse, HttpResponseBadRequest
+from django.http import HttpRequest, JsonResponse, HttpResponseBadRequest, QueryDict
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
@@ -9,16 +9,15 @@ from django.views.generic import View
 from django.urls import reverse
 
 from .models import Derecho, Tramite, Cliente
-from .form import TransaccionForm, TramiteForm
+from .form import TransaccionForm, TramiteForm, ClienteForm
 from .serializers import TramiteSerializer, ClienteSerializer
-
 
 def test(request):
     if request.method == "GET":
         form = TramiteForm()
         return render(request, 'test.html', {"form": form})
 
-    elif request.headers.get("X-Requested-Type") == "autocomplete":
+    elif "autocomplete" == request.headers.get("X-Requested-Type"):
         json_data = json.loads(request.body.decode("utf-8"))
 
         key_name = "query"
@@ -31,13 +30,21 @@ def test(request):
             serializer = ClienteSerializer(queryset, many=True)
             return JsonResponse(serializer.data, safe=False)
         return JsonResponse([], safe=False)
+    
+    elif "create_user"== request.headers.get("X-Requested-Type"):
+        querydict= QueryDict(request.body)
+        cliente= ClienteForm(querydict)
+        if cliente.is_valid():
+            cliente= cliente.save()
+            serializer = ClienteSerializer(cliente)
+            return JsonResponse(serializer.data, safe=False)
+        return JsonResponse([], safe=False)
 
     elif "button-transaccion" in request.POST:
         form= TransaccionForm(request.POST)
         if form.is_valid():
             form.save()
-            pass
-        print()
+        return redirect("transactions:dashboard")
     elif "pre-select" in request.POST:
         registro_name = 'registro'
         clasificacion_name = 'clasificacion'
@@ -52,7 +59,8 @@ def test(request):
         tramite.fields[registro_name].widget.attrs['disabled'] = True
         tramite.fields[clasificacion_name].widget.attrs['disabled'] = True
         transaccion = TransaccionForm()
-        return render(request, 'test-2.html', {"transaccion": transaccion, "tramite": tramite})
+        cliente= ClienteForm()
+        return render(request, 'test-2.html', {"transaccion": transaccion, "tramite": tramite, "cliente": cliente})
 
 
 def signout(request: HttpRequest):

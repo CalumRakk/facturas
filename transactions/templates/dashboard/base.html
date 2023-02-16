@@ -138,16 +138,13 @@
   </header><!-- End Header -->
 
   {% block content %}
-
   {% endblock content %}
 
-  <!-- Script -->
   {% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>  {% endcomment %}
-  <script src="{% static 'transactions/lib/bootstrap/js/bootstrap.min.js' %}"></script>
-  <script src="{% static 'transactions/lib/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  {% comment %} <script src="{% static 'transactions/lib/bootstrap/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'transactions/lib/bootstrap/js/bootstrap.bundle.min.js' %}"></script> {% endcomment %}
   
-  {% block script %}
-  
+  {% block script %}  
   {% endblock script %}
 </body>
 

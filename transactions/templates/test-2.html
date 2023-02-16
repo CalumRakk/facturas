@@ -62,7 +62,8 @@
                         <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Cliente -->
                             <div>
                                 <h6 class="my-0">Cliente</h6>
-                                <small class="form-control-plaintext text-muted" id="client-name-container">Ninguno.</small>
+                                <small class="form-control-plaintext text-muted"
+                                    id="client-name-container">Ninguno.</small>
                                 <input type="hidden" name="{{ transaccion.cliente.name }}" value="" readonly>
 
                             </div>
@@ -71,8 +72,8 @@
                         <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Registro -->
                             <div>
                                 <h6 class="my-0"> {{ tramite.registro.label }}</h6>
-                                {% comment %} <small class="form-control-plaintext text-muted" id="client-name-container">{{ tramite.registro.value | upper }}</small>                                {% endcomment %}
-                                <input class="form-control-plaintext text-muted" value="{{ tramite.registro.value | upper }}" readonly>
+                                <input class="form-control-plaintext text-muted"
+                                    value="{{ tramite.registro.value | upper }}" readonly>
                             </div>
                         </li><!-- Fin Registro -->
 
@@ -119,7 +120,8 @@
                             </div>
                         </li>
                     </ul>
-                    <button name="button-transaccion" class="btn btn-primary btn-lg btn-block" type="submit">Procesar</button>
+                    <button name="button-transaccion" class="btn btn-primary btn-lg btn-block"
+                        type="submit">Procesar</button>
                 </form>
             </div><!-- Final Seccion de Transacción -->
 
@@ -127,11 +129,25 @@
             <div class="col-md-8 order-md-1">
                 <h4 class="mb-3">Cliente</h4>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <input type="search" id="input-search-cliente" name="query" placeholder="N.documento "
+                    <div class="col-md-4 mb-3">
+                        <input class="form-control" type="search" id="input-search-cliente" name="query" placeholder="N.documento "
                             title="Buscar Cliente">
-                        <button title="Search" id="button-search-cliente"><i class="bi bi-search"></i>Buscar</button>
                     </div>
+                    <div class="col-md-3 mb-3">
+                        <button class="btn btn-secondary" title="Search" id="button-search-cliente"><i class="bi bi-search"></i>Buscar</button>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div id="dialog-form" title="Registrar nuevo Cliente">
+                            <form id="my-form" method="post">
+                                <fieldset>
+                                    {{ cliente }}
+                                    <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+                                </fieldset>
+                            </form>
+                        </div>
+                        <button class="btn btn-secondary" id="create-user" class="">Crear Cliente</button>
+                    </div>
+
                 </div>
                 <div class="row">
                     <table class="table">
@@ -147,14 +163,9 @@
                         </tbody>
                     </table>
                 </div>
-
-
                 <hr class="mb-4">
-
                 <h4 class="mb-3">Tramite</h4>
-
-                
-                <hr class="mb-4">                
+                <hr class="mb-4">
             </div>
         </div>
     </div>
@@ -165,8 +176,53 @@
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-
-<script src="{% static 'transactions/js/test.js' %}"></script>
-
 <script src="{% static 'transactions/js/transactions/cliente.js' %}"> </script>
+<script>
+    $(function () {
+        const CrearCliente_btnId = "#create-user";
+        const DialogoForm_Id = "#dialog-form";
+
+        const crear_user = () => {
+            var formData = $('#my-form').serialize();
+            $.ajax({
+                url: window.location.href,
+                type: 'POST',
+                data: formData,
+                headers: {
+                    "X-Requested-Type": "create_user",
+                    "Content-Type": "application/json; charset=utf-8",
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                success: function (data) {
+                    console.log(data)
+                    dialog.dialog("close");
+                    form[0].reset();
+                }
+            });
+        }
+
+        const dialog = $(DialogoForm_Id).dialog({
+            autoOpen: false,
+
+            modal: true,
+            buttons: {
+                "Crear Cliente": crear_user,
+                Cancel: function () {
+                    dialog.dialog("close");
+                }
+            },
+            close: function () {
+                form[0].reset();
+            }
+        });
+
+        const form = dialog.find("form").on("submit", function (event) {
+            event.preventDefault();
+        });
+
+        $(CrearCliente_btnId).on("click", function () {
+            dialog.dialog("open");
+        });
+    });
+</script>
 {% endblock content %}

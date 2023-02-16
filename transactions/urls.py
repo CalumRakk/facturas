@@ -15,5 +15,5 @@ urlpatterns = [
     path('test/', views.test, name="test"),
 
     path('dashboard/', login_required(views.dashboard), name="dashboard"),
-    path('tramite/', login_required(Tramite_view.as_view()), name='tramite'),
+    path('tramite/', login_required(Tramite_view.as_view()), name='tramite')
 ]

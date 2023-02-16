@@ -1,8 +1,12 @@
 
 from django import forms
-from .models import Transaccion, Tramite, Vehiculo
+from .models import Transaccion, Tramite, Vehiculo, Cliente
 
 
+class ClienteForm(forms.ModelForm):    
+    class Meta:
+        model = Cliente
+        fields = '__all__'
 class TramiteForm(forms.ModelForm):
     class Meta:
         model = Tramite
