@@ -33,7 +33,11 @@ def test(request):
         return JsonResponse([], safe=False)
 
     elif "button-transaccion" in request.POST:
-        pass
+        form= TransaccionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            pass
+        print()
     elif "pre-select" in request.POST:
         registro_name = 'registro'
         clasificacion_name = 'clasificacion'

@@ -93,9 +93,6 @@ class Tramite(models.Model):
         Derecho, through="TramiteDerecho", related_name="derechos"
     )
 
-    # valor_total = models.DecimalField(
-    #     max_digits=10, decimal_places=0, default=0.00) # No parece necesario tener este campo.
-
     creado = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(default=timezone.now)
 
@@ -139,10 +136,12 @@ class Transaccion(models.Model):
 
     def __str__(self):
         return f"{self.cliente} : {self.vehiculo} : {self.tramite} : {self.estado}"
+    
+    valor_total = models.DecimalField(max_digits=10, decimal_places=0, default=0.00) # No parece necesario tener este campo.
 
-    # def save(self, *args, **kwargs):
-    #     self.valor = self.tramite.derechos.aggregate(Sum("valor"))["valor__sum"]
-    #     super(Transaccion, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.valor_total = self.tramite.tramitederecho_set.aggregate(Sum("valor"))["valor__sum"]
+        super(Transaccion, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("transaccion_detail", kwargs={"pk": self.pk})
