@@ -160,39 +160,19 @@
 
         function add_derecho(data) {
             derechos.add(data);
-            refreshCallbacks();
-            // update_derechos_input()
+            refreshCallbacks(); 
         };
-        // function update_derechos_input() {
-        //     // items = derechos.toJSON()
-        //     // data = items.map(function (item) { return item.id.toString() })
-        //     // $(derechos_input_id).val(JSON.stringify(data));
 
-        //     $(derechos_input_id).empty();          
-        //     items = derechos.toJSON()
-        //     $.each(items, function(index, item) {
-        //         const name = item.name;
-        //         const id = item.id;
-        //         var newOption = $("<option>").val(id).text(name).prop("selected", true);
-        //         $(derechos_input_id).append(newOption);
-        //     });
-
-        // if (items.length > 0) {
-        //     $(search_input_id).prop("required", false);
-        // } else {
-        //     prop("required", true)
-        // }
-
-        // }
         function get_all_data() {
+            //
             items = derechos.toJSON()
-            derechos = items.map(function (item) { return item.id })
+            derechos_values = items.map(function (item) { return item.id })
             data = {
                 name: $("#id_name").val(),
                 national_register: $("#id_national_register").val(),
                 classification: $("#id_classification").val(),
                 vigencia: $("#id_vigencia").val(),
-                derechos: derechos
+                derechos: derechos_values
             }
             return data
         }
@@ -202,7 +182,7 @@
             $.ajax({
                 url: window.location.href,
                 type: "POST",
-                data: JSON.stringify({ data: get_all_data() }),
+                data: JSON.stringify({ tramite: get_all_data() }),
                 headers: {
                     "X-Requested-Type": "post",
                     "Content-Type": "application/json; charset=utf-8",

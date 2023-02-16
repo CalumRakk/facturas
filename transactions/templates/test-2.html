@@ -1,0 +1,161 @@
+{% extends "dashboard/base.html" %}
+
+{% load static %}
+
+
+<!-- 
+{% block head %}
+
+{% endblock head %} -->
+
+{% block content %}
+<main id="main" class="main">
+    <!-- Page Title -->
+    <div class="pagetitle">
+        <h1>Dashboard</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'transactions:dashboard' %}">Home</a></li>
+                <li class="breadcrumb-item active">Clientes</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <!-- Container -->
+    <div class="container">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <input type="text" id="input-search-cliente" name="query" placeholder="Search"
+                        title="Enter search keyword">
+                    <button type="submit" title="Search" id="button-search-cliente"><i
+                            class="bi bi-search"></i>Buscar</button>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>N. Documento</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            {{ form.national_register.label_tag }}
+                            {{ form.national_register }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.national_register.label_tag }}
+                            {{ form.national_register }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.classification.label_tag }}
+                            {{ form.classification }}
+                        </div>
+                        <button type="submit" name="tramite" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- Fin Container -->
+</main>
+
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<script src="{% static 'transactions/js/test.js' %}"></script>
+
+<script>
+    var inputSearch_id = "#input-search-cliente"
+    var btnSearch_id = "#button-search-cliente"
+
+    const object_message = {
+        class_name: "45522145",
+        is_open: false,
+        get_element: function () {
+            const msg_class = "45522145"
+            var mensaje = $(`<div class='${msg_class}'>No se encontro resultados</div>`);
+            $("body").append(mensaje);
+            $(`.${msg_class}`).css({
+                "background-color": "yellow",
+                "color": "black",
+                "font-weight": "bold",
+                "padding": "5px",
+                "position": "absolute",
+            });
+            return mensaje
+        },
+        show: function () {
+            if (this.is_open == false) {
+                this.is_open = true;
+                const inputPos = $(inputSearch_id).position();
+                element = this.get_element();
+                element.css({
+                    top: inputPos.top - element.outerHeight() - 5,
+                    left: inputPos.left
+                });
+                element.fadeIn().delay(2000).fadeOut(function () {
+                    this.is_open = false;
+                    element.remove();
+                }.bind(this, element));
+            }
+        }
+    }
+
+
+    $(btnSearch_id).click(function () {
+        const term = $(inputSearch_id).val()
+        $.ajax({
+            url: window.location.href,
+            type: "POST",
+            data: JSON.stringify({ "query": term }),
+            headers: {
+                "X-Requested-Type": "autocomplete",
+                "Content-Type": "application/json; charset=utf-8",
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            success: function (data) {
+                if (data.length == 0) {
+                    object_message.show();
+                }
+
+                $("table tbody").empty();
+
+                $.each(data, function (index, element) {
+                    var new_row = $(`
+                    <tr id='${element.id}'> 
+                        <td class='name'>${element.name}</td>
+                        <td class'document_number'>${element.document_number}</td> 
+                        <td>
+                            <button class="edit-item-btn">Edit</button>
+                            <button class="remove-item-btn">Remove</button>
+                        </td>
+                    </tr>
+                    
+                    `);
+                    $("table").append(new_row);
+
+                    if (index === data.length - 1) {
+                        removeBtns = $(".remove-item-btn");
+                        removeBtns.click(function () {
+                            var tr_element = $(this).closest('tr')
+                            tr_element.remove()
+                        });
+                    }
+                });
+            },
+        });
+    });
+
+</script>
+{% endblock content %}

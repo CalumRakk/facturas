@@ -2,11 +2,6 @@
 
 {% load static %}
 
-{% block head %}
-
-
-{% endblock head %}
-
 {% block content %}
 <main id="main" class="main">
     <!-- Page Title -->
@@ -22,96 +17,29 @@
 
     <!-- Container -->
     <div class="container">
-        <div class="row">
-            <div class="row col-xl-9 mx-auto">
-                <h4 class="mb-3">Tramites</h4>
-                <div id="tramites">
-                    <table class="table text-center">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nombre</th>
-                                <th>Registro Nacional</th>
-                                <th>Clasificación</th>
-                                <th>Derechos</th>
-                                <th>Vigencia</th>
-                                <th>Opciones</th>
-                            </tr>
-                        </thead>
-                        <tbody class="list">
-                            <tr>
-                                <td class="id"></td>
-                                <td class="name"></td>
-                                <td class="national_register"></td>
-                                <td class="classification"></td>
-                                <td class="derechos"></td>
-                                <td class="vigencia"></td>
-                                <td>
-                                    <button class="remove-item-btn">X</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ form.national_register.label_tag }}
+                            {{ form.national_register }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.classification.label_tag }}
+                            {{ form.classification }}
+                        </div>
+                        <button type="submit" name="pre-select" class="btn btn-primary">Siguiente</button>
+                    </form>
                 </div>
             </div>
         </div>
+
     </div><!-- Fin Container -->
 </main>
 
-<!-- Archivos JavaScript de Bootstrap -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 
 {% endblock content %}
-
-{% block script %}
-
-<script>
-    $(function () {
-        {% comment %} CSRFToken = document.querySelector('[name=csrfmiddlewaretoken]').value {% endcomment %}
-
-        $.ajax({
-            type: 'GET',
-            url: window.location.origin + "/tramites/" + "?limit=5",
-            dataType: 'json',
-            headers: {
-                "X-Requested-Type": "get"
-            },
-            success: function (data) {
-                // Crea una nueva instancia de List.js para la tabla
-                const tramites_options = {
-                    valueNames: ['id', 'name', 'national_register', 'classification', 'derechos', 'vigencia']
-                };
-
-                var tramites = new List('tramites', tramites_options);
-                tramites.clear()
-
-                // Agrega cada objeto de datos como una nueva fila en la tabla
-                data["tramites"].forEach(function (item) {
-                    tramites.add({
-                        id: item.id,
-                        name: item.name,
-                        national_register: item.national_register,
-                        classification: item.classification,
-                        derechos: item.derechos,
-                        vigencia: item.vigencia
-                    });
-                });
-            }
-        });
-    });
-</script>
-
-{% endblock script %}
