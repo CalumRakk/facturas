@@ -1,5 +1,3 @@
-
-# Create your views here.
 import json
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -9,24 +7,27 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.views.generic import View
 from django.urls import reverse
-from rest_framework.decorators import api_view
 
 from .models import Derecho, Tramite, Cliente
-from .form import TransaccionForm
+from .form import TransaccionForm, TramiteForm
 from .serializers import TramiteSerializer, ClienteSerializer
 
 
 def test(request):
     if request.method == "GET":
-        form = TransaccionForm()
+        form = TramiteForm()
         return render(request, 'test.html', {"form": form})
 
     elif request.headers.get("X-Requested-Type") == "autocomplete":
         json_data = json.loads(request.body.decode("utf-8"))
+
         key_name = "query"
-        if json_data.get(key_name) and json_data[key_name].isnumeric():
-            queryset = Cliente.objects.filter(
-                document_number=json_data["query"])
+        n_documento = json_data[key_name]
+        is_field_exist = True if json_data.get(key_name) else False
+        tipo_documento= Cliente.TipoDocumento.choices[0][0]
+
+        if is_field_exist and n_documento.isnumeric():
+            queryset = Cliente.objects.filter(num_documento=n_documento,tipo_documento=tipo_documento )
             serializer = ClienteSerializer(queryset, many=True)
             return JsonResponse(serializer.data, safe=False)
         return JsonResponse([], safe=False)
@@ -34,20 +35,20 @@ def test(request):
     elif "button-transaccion" in request.POST:
         pass
     elif "pre-select" in request.POST:
-        registro_nacional = request.POST.get('national_register')
-        tipo_vehiculo = request.POST.get('classification')
+        registro_name = 'registro'
+        clasificacion_name = 'clasificacion'
 
-        # Crear el diccionario de datos con los valores iniciales
-        initial_data = {'national_register': registro_nacional,
-                        'classification': tipo_vehiculo}
+        initial_data = {
+            registro_name: request.POST.get(registro_name),
+            clasificacion_name: request.POST.get(clasificacion_name)
+        }
 
-        # Crear una instancia del formulario con los valores iniciales
-        form = TransaccionForm(initial=initial_data)
+        tramite = TramiteForm(initial=initial_data)
 
-        # añadir el atributo HTML 'disabled' para que el usuario no modifique estos campos.
-        form.fields['national_register'].widget.attrs['disabled'] = True
-        form.fields['classification'].widget.attrs['disabled'] = True
-        return render(request, 'test-2.html', {"form": form})
+        tramite.fields[registro_name].widget.attrs['disabled'] = True
+        tramite.fields[clasificacion_name].widget.attrs['disabled'] = True
+        transaccion = TransaccionForm()
+        return render(request, 'test-2.html', {"transaccion": transaccion, "tramite": tramite})
 
 
 def signout(request: HttpRequest):

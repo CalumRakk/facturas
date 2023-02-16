@@ -23,13 +23,13 @@
                     <form method="post">
                         {% csrf_token %}
                         <div class="form-group">
-                            {{ form.national_register.label_tag }}
-                            {{ form.national_register }}
+                            {{ form.registro.label_tag }}
+                            {{ form.registro }}
                         </div>
 
                         <div class="form-group">
-                            {{ form.classification.label_tag }}
-                            {{ form.classification }}
+                            {{ form.clasificacion.label_tag }}
+                            {{ form.clasificacion }}
                         </div>
                         <button type="submit" name="pre-select" class="btn btn-primary">Siguiente</button>
                     </form>

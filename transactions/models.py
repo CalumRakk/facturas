@@ -2,100 +2,147 @@
 
 # Create your models here.
 from django.db import models
-from django.contrib.auth.models import User
 from django.utils import timezone
-from django.core import serializers
-import json
-CLASSIFICATION = [
-    ('automobile', 'automóvil'),
-    ('motorcycle', 'moto')
-]
-STATUS_CHOICES = [
-    ('pending', 'Pending'),
-    ('approved', 'Approved'),
-]
-
-NATIONAL_REGISTRY = [
-    ("rna", "RNA"), ("rnc", "RNC")
-]
-
-
-class Vehiculo(models.Model):
-    classification = models.CharField(max_length=30, choices=CLASSIFICATION, default=CLASSIFICATION[0][0])
-    license_plate = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.classification + ' - ' + self.license_plate
+from django.db.models import Sum
 
 
 class Cliente(models.Model):
-    name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    document_type = models.CharField(max_length=100)
-    document_number = models.IntegerField()
-    phone = models.CharField(max_length=100)
+    class TipoDocumento(models.TextChoices):
+        CC = "CC", "Cedula de Ciudadania"
+        CE = "CE", "Cedula de Extranjeria"
+        TI = "TI", "Tarjeta de Identidad"
+        RC = "RC", "Registro Civil"
+        PA = "PA", "Pasaporte"
+
+    nombre = models.CharField(max_length=200)
+    apellido = models.CharField(max_length=200)
+    tipo_documento = models.CharField(
+        max_length=2, choices=TipoDocumento.choices, default=TipoDocumento.CC
+    )
+    num_documento = models.CharField(max_length=20)
+    telefono = models.CharField(max_length=20, blank=True)
+
+    creado = models.DateTimeField(auto_now_add=True)
+    actualizado = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        self.nombre = self.nombre.upper()
+        self.apellido = self.apellido.upper()
+        super(Cliente, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.name + ' ' + self.last_name
+        return f"{self.nombre.capitalize()} {self.apellido.capitalize()} - {self.tipo_documento}{self.num_documento}"
 
 
-class Asesor(models.Model):
-    name = models.CharField(max_length=100)
-    employee_number = models.CharField(max_length=100)
+class Vehiculo(models.Model):
+    class Clase(models.TextChoices):
+        MOTO = "MOTO", "Moto"
+        AUTOMOVIL = "AUTOMOVIL", "Automovil"
+        MOTOCARRO = "MOTOCARRO", "Motocarro"
+
+    tipo_vehiculo = models.CharField(
+        max_length=50, choices=Clase.choices, default=Clase.AUTOMOVIL
+    )
+    placa = models.CharField(max_length=20)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+
+    creado = models.DateTimeField(auto_now_add=True)
+    actualizado = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        self.placa = self.placa.upper()
+        super(Vehiculo, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.name + ' - ' + self.employee_number
+        return f"{self.placa.upper()} - {self.tipo_vehiculo}"
 
 
 class Derecho(models.Model):
-    name = models.CharField(max_length=100)
-    classification = models.CharField(max_length=30, choices=CLASSIFICATION)
-    percentage = models.DecimalField(max_digits=15, decimal_places=2)
+    nombre = models.CharField(max_length=200)
+    activo = models.BooleanField(default=True)
+
+    creado = models.DateTimeField(auto_now_add=True)
+    actualizado = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        self.nombre = self.nombre.upper()
+        super(Derecho, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.name + ' - ' + self.classification
+        return f"{self.nombre.upper()}"
 
 
 class Tramite(models.Model):
-    name = models.CharField(max_length=100)
-    national_register = models.CharField(
-        choices=NATIONAL_REGISTRY, max_length=30)
-    classification = models.CharField(
-        choices=CLASSIFICATION, max_length=30, default=CLASSIFICATION[0][0])
-    derechos = models.ManyToManyField(Derecho)
-    vigencia = models.DateTimeField()
+    class RegistroNacional(models.TextChoices):
+        RNA = "RNA", "Registro Nacional de Automotores"
+        RNC = "RNC", "Registro Nacional de Conductor"
+
+    nombre = models.CharField(max_length=200)
+
+    registro = models.CharField(
+        max_length=3, choices=RegistroNacional.choices, default=RegistroNacional.RNA
+    )
+
+    clasificacion = models.CharField(
+        max_length=50, choices=Vehiculo.Clase.choices, default=Vehiculo.Clase.AUTOMOVIL
+    )
+
+    vigencia = models.DateField()
+
+    derechos = models.ManyToManyField(
+        Derecho, through="TramiteDerecho", related_name="derechos"
+    )
+
+    # valor_total = models.DecimalField(
+    #     max_digits=10, decimal_places=0, default=0.00) # No parece necesario tener este campo.
+
+    creado = models.DateTimeField(auto_now_add=True)
+    actualizado = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        self.nombre = self.nombre.upper()
+        super(Tramite, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.name + ' - ' + self.classification
-
-    def to_json(self):
-        derechos = self.derechos
-        data = serializers.serialize('json', [self])
-        json_data = json.loads(data)[0]["fields"]
-        json_data.update({"value": f"{self.name} - {self.classification}"})
-        return json_data
+        return f"{self.registro} : {self.clasificacion} : {self.nombre.upper()}"
 
 
 class TramiteDerecho(models.Model):
-    derecho = models.ForeignKey(Derecho, on_delete=models.CASCADE)
     tramite = models.ForeignKey(Tramite, on_delete=models.CASCADE)
-    sale_value = models.DecimalField(max_digits=15, decimal_places=2)
-    vigencia = models.DateTimeField()
+    derecho = models.ForeignKey(Derecho, on_delete=models.CASCADE)
+    valor = models.DecimalField(max_digits=10, decimal_places=0)
+
+    creado = models.DateTimeField(auto_now_add=True)
+    actualizado = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.tramite} : {self.derecho} : {self.valor}"
 
 
 class Transaccion(models.Model):
+    class Estado(models.TextChoices):
+        PENDIENTE = "PENDIENTE", "Pendiente"
+        PAGADO = "PAGADO", "Pagado"
+        CANCELADO = "CANCELADO", "Cancelado"
+
+
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    creation_at = models.DateTimeField(auto_now_add=True)
-    vehicle = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, blank=True, null=True)
     tramite = models.ForeignKey(Tramite, on_delete=models.CASCADE)
-    status = models.CharField(
-        max_length=10,
-        choices=STATUS_CHOICES,
-        default='pending',
+
+    estado = models.CharField(
+        max_length=10, choices=Estado.choices, default=Estado.PENDIENTE
     )
-    comment = models.TextField()
-    national_register = models.CharField(
-        choices=NATIONAL_REGISTRY, max_length=30)  # ¿Realmente debe ir este campo?
+
+    creado = models.DateTimeField(auto_now_add=True)
+    actualizado = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.status
+        return f"{self.cliente} : {self.vehiculo} : {self.tramite} : {self.estado}"
+
+    # def save(self, *args, **kwargs):
+    #     self.valor = self.tramite.derechos.aggregate(Sum("valor"))["valor__sum"]
+    #     super(Transaccion, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("transaccion_detail", kwargs={"pk": self.pk})

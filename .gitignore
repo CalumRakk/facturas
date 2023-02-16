@@ -5,3 +5,4 @@ __pycache__
 .vscode/
 archive/
 doc-page-source/
+staticfiles/

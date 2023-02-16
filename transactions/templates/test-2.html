@@ -48,10 +48,10 @@
 
     <div class="container">
         <div class="row">
+            <div class="col-md-4 order-md-2 mb-4"><!-- Seccion de Transacción -->
 
-            {% csrf_token %}
-            <div class="col-md-4 order-md-2 mb-4">
                 <form method="post">
+                    {% csrf_token %}
                     <h4 class="d-flex justify-content-between align-items-center mb-3">
                         <span class="text-muted">Tu Transacción</span>
                         <span class="badge badge-secondary badge-pill">3</span>
@@ -60,11 +60,9 @@
                         <li class="list-group-item d-flex justify-content-between lh-condensed">
                             <div>
                                 <h6 class="my-0">Cliente</h6>
-                                <small class="form-control-plaintext text-muted" id="client-name-container">Brief
-                                    description</small>
-
+                                <small class="form-control-plaintext text-muted" id="client-name-container">Ninguno.</small>
                                 <input class="form-control-plaintext text-muted" type="hidden"
-                                    name="{{ form.cliente.name }}" id="{{ form.cliente.id_for_label }}" value="tes"
+                                    name="{{ transaccion.cliente.name }}" id="{{ transaccion.cliente.id_for_label }}" value="tes"
                                     readonly>
 
                             </div>
@@ -72,23 +70,23 @@
 
                         <li class="list-group-item d-flex justify-content-between lh-condensed">
                             <div>
-                                <h6 class="my-0"> {{ form.national_register.label }}</h6>
+                                <h6 class="my-0"> {{ tramite.registro.label }}</h6>
                                 <input class="form-control-plaintext text-muted" type="text"
-                                    value="{{ form.national_register.value | upper }}" readonly>
+                                    value="{{ tramite.registro.value | upper }}" readonly>
                             </div>
                         </li>
                         <li class="list-group-item d-flex justify-content-between lh-condensed">
                             <div>
-                                <h6 class="my-0"> {{ form.classification.label }}</h6>
-                                <input class="form-control-plaintext text-muted" name="{{ form.classification.name }}"
-                                    type="text" value="{{ form.classification.value | upper }}" readonly>
+                                <h6 class="my-0"> {{ tramite.clasificacion.label }}</h6>
+                                <input class="form-control-plaintext text-muted" name="{{ tramite.clasificacion.name }}"
+                                    type="text" value="{{ tramite.clasificacion.value | upper }}" readonly>
 
                             </div>
 
                         </li>
                     </ul>
                 </form>
-            </div>
+            </div><!-- Final Seccion de Transacción -->
 
 
             <div class="col-md-8 order-md-1">
@@ -105,6 +103,7 @@
                         <thead>
                             <tr>
                                 <th>Nombre</th>
+                                <th>T. documento</th>
                                 <th>N. Documento</th>
                                 <th>Opciones</th>
                             </tr>
@@ -119,14 +118,13 @@
 
                 <h4 class="mb-3">Tramite</h4>
 
-                {{ form.tramite }}
+                {{ transaccion.tramite }}
                 <hr class="mb-4">
 
                 <button name="button-transaccion" class="btn btn-primary btn-lg btn-block" type="submit">Continue to
                     checkout</button>
             </div>
         </div>
-
     </div>
 </main>
 
@@ -138,100 +136,5 @@
 
 <script src="{% static 'transactions/js/test.js' %}"></script>
 
-<script>
-    var inputSearch_id = "#input-search-cliente"
-    var btnSearch_id = "#button-search-cliente"
-    var smallClientNameContainer = "#client-name-container"
-
-    const object_message = {
-        class_name: "45522145",
-        is_open: false,
-        get_element: function () {
-            const msg_class = "45522145"
-            var mensaje = $(`<div class='${msg_class}'>No se encontro resultados</div>`);
-            $("body").append(mensaje);
-            $(`.${msg_class}`).css({
-                "background-color": "yellow",
-                "color": "black",
-                "font-weight": "bold",
-                "padding": "5px",
-                "position": "absolute",
-            });
-            return mensaje
-        },
-        show: function () {
-            if (this.is_open == false) {
-                this.is_open = true;
-                const inputPos = $(inputSearch_id).position();
-                element = this.get_element();
-                element.css({
-                    top: inputPos.top - element.outerHeight() - 5,
-                    left: inputPos.left
-                });
-                element.fadeIn().delay(2000).fadeOut(function () {
-                    this.is_open = false;
-                    element.remove();
-                }.bind(this, element));
-            }
-        }
-    }
-
-
-    $(btnSearch_id).click(function () {
-        const term = $(inputSearch_id).val()
-        $.ajax({
-            url: window.location.href,
-            type: "POST",
-            data: JSON.stringify({ "query": term }),
-            headers: {
-                "X-Requested-Type": "autocomplete",
-                "Content-Type": "application/json; charset=utf-8",
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            success: function (data) {
-                if (data.length == 0) {
-                    object_message.show();
-                }
-
-                $("table tbody").empty();
-
-                $.each(data, function (index, element) {
-                    var new_row = $(`
-                    <tr id='${element.id}'> 
-                        <td class='name'>${element.name}</td>
-                        <td class'document_number'>${element.document_number}</td> 
-                        <td>
-                            <button class="vincular-btn">Vincular</button>
-                            <button class="desvincular-btn">Desvincular</button>
-                        </td>
-                    </tr>
-                    
-                    `);
-                    $("table").append(new_row);
-
-                    if (index === data.length - 1) {
-
-                        vincularBtns = $(".vincular-btn");
-                        vincularBtns.click(function () {
-                            const tr_element = $(this).closest('tr');
-                            const tr_id = tr_element.attr("id");
-                            const td_name = $(this).closest('tr').find('.name').text();
-                            console.log(tr_id, td_name);
-                            $(smallClientNameContainer).text(td_name);
-                            $(smallClientNameContainer).next().val(tr_id)
-                        });
-
-                        desvincularBtns = $(".desvincular-btn");
-                        desvincularBtns.click(function () {
-                            $(smallClientNameContainer).empty();
-                            $(smallClientNameContainer).next().val("")
-                        });
-
-                    }
-                });
-            },
-        });
-    });
-
-</script>
+<script src="{% static 'transactions/js/transactions/cliente.js' %}"> </script>
 {% endblock content %}
