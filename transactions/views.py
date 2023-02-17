@@ -12,7 +12,7 @@ from .models import Derecho, Tramite, Cliente, Transaccion, Vehiculo
 from .form import TransaccionForm, TramiteForm, ClienteForm
 from .serializers import TramiteSerializer, ClienteSerializer
 from django.core.exceptions import ValidationError
-from .utils import checker
+from .utils import checker, buscar_objeto
 
 
 def test(request):
@@ -63,22 +63,24 @@ def test(request):
         if isinstance(cliente, dict):
             errors.update(cliente)
         
-        if len(errors.keys())  >0:            
+        if len(errors.keys())  >0:  
+            errors.update({"status":"fail"})          
             return JsonResponse(errors, safe=False)        
         
         if cliente.pk is None:
             cliente.save()  
       
         data["cliente"]=cliente
-        data["vehiculo"]= Vehiculo.objects.get(id=data["vehiculo"])
-        data["tramite"]= Tramite.objects.get(id=data["tramite"])
+        data["vehiculo"]= buscar_objeto(Vehiculo, data.get("vehiculo"))
+        data["tramite"]= buscar_objeto(Tramite, data.get("tramite"))
         data["valor_total"]= "1"     
 
         transaction = TransaccionForm(data=data)
         if transaction.is_valid():
             transaction.save()
-            return JsonResponse({"redirect_url": reverse("transactions:test")})
-        return JsonResponse({'error': transaction.errors.as_text()}, status=400)       
+            return JsonResponse({"status":"ok","redirect_url": reverse("transactions:test")})
+        errors.update({"transaccion": transaction.errors.as_text(),"status":"fail"})
+        return JsonResponse(errors, safe=False)       
         
 
     elif "pre-select" in request.POST:

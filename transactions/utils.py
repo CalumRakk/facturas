@@ -14,6 +14,8 @@ def buscar_objeto(modelo: Union[Model, ModelForm], id_objeto) -> Union[Model, No
         id_objeto: el id que se buscará en la Clase del modelo.
     """
     try:
+        if id_objeto=="":
+            return None
         if issubclass(modelo, ModelForm):
             modelo = modelo.Meta.model
         objeto = modelo.objects.get(id=id_objeto)

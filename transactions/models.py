@@ -124,7 +124,7 @@ class Transaccion(models.Model):
 
 
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, blank=True, null=True)
+    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
     tramite = models.ForeignKey(Tramite, on_delete=models.CASCADE)
 
     estado = models.CharField(
