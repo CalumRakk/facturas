@@ -1,6 +1,4 @@
 
-
-
 var inputSearch_id = "#input-search-cliente"
 var btnSearch_id = "#button-search-cliente"
 var smallClientNameContainer = "#client-name-container"
@@ -37,7 +35,52 @@ const object_message = {
         }
     }
 }
+var cliente_transaccion = {
+    add: function (array) {
+        $("table tbody").empty();
+        $.each(array, function (index, element) {
+            var new_row = $(`
+            <tr id='${element.id}'> 
+                <td class='nombre'>${element.nombre}</td>
+                <td class='tipo_documento'>${element.tipo_documento}</td>
+                <td class'num_documento'>${element.num_documento}</td> 
+                <td>
+                    <button class="vincular-btn">Vincular</button>
+                    <button class="desvincular-btn">Desvincular</button>
+                </td>
+            </tr>
+            
+            `);
+            $("table").append(new_row);
 
+            if (index === array.length - 1) {
+
+                vincularBtns = $(".vincular-btn");
+                vincularBtns.click(function () {
+                    const tr_element = $(this).closest('tr');
+                    const tr_id = tr_element.attr("id");
+                    const td_name = $(this).closest('tr').find('.nombre').text();
+                    console.log(tr_id, td_name);
+                    $(smallClientNameContainer).text(td_name);
+                    $(smallClientNameContainer).next().val(tr_id)
+                });
+
+                desvincularBtns = $(".desvincular-btn");
+                desvincularBtns.click(function () {
+                    $(smallClientNameContainer).empty();
+                    $(smallClientNameContainer).next().val("")
+                });
+
+            }
+        });
+
+    },
+    set: function (data) {
+        // Recibe un json y añade en la seccion de Transacción el nombre y el Id para que se envie en el formulario.
+        $(smallClientNameContainer).text(data.nombre);
+        $(smallClientNameContainer).next().val(data.id)
+    }
+}
 
 $(btnSearch_id).click(function () {
     const term = $(inputSearch_id).val()
@@ -54,44 +97,9 @@ $(btnSearch_id).click(function () {
             if (data.length == 0) {
                 object_message.show();
             }
-
-            $("table tbody").empty();
-
-            $.each(data, function (index, element) {
-                var new_row = $(`
-                <tr id='${element.id}'> 
-                    <td class='nombre'>${element.nombre}</td>
-                    <td class='tipo_documento'>${element.tipo_documento}</td>
-                    <td class'num_documento'>${element.num_documento}</td> 
-                    <td>
-                        <button class="vincular-btn">Vincular</button>
-                        <button class="desvincular-btn">Desvincular</button>
-                    </td>
-                </tr>
-                
-                `);
-                $("table").append(new_row);
-
-                if (index === data.length - 1) {
-
-                    vincularBtns = $(".vincular-btn");
-                    vincularBtns.click(function () {
-                        const tr_element = $(this).closest('tr');
-                        const tr_id = tr_element.attr("id");
-                        const td_name = $(this).closest('tr').find('.nombre').text();
-                        console.log(tr_id, td_name);
-                        $(smallClientNameContainer).text(td_name);
-                        $(smallClientNameContainer).next().val(tr_id)
-                    });
-
-                    desvincularBtns = $(".desvincular-btn");
-                    desvincularBtns.click(function () {
-                        $(smallClientNameContainer).empty();
-                        $(smallClientNameContainer).next().val("")
-                    });
-
-                }
-            });
+            cliente_transaccion.add(data)
+            // cliente_transaccion.set(data[0])
         },
     });
 });
+

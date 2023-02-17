@@ -194,7 +194,7 @@
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 },
                 success: function (data) {
-                    console.log(data)
+                    cliente_transaccion.set(data)
                     dialog.dialog("close");
                     form[0].reset();
                 }
