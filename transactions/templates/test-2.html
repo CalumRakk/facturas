@@ -68,7 +68,7 @@
         <div class="row">
             <div class="col-md-4 order-md-2 mb-4"><!-- Seccion de Transacción -->
 
-                <form method="post">
+                <form method="post" id="procesarTransaccion">
                     {% csrf_token %}
                     <h4 class="d-flex justify-content-between align-items-center mb-3">
                         <span class="text-muted">Tu Transacción</span>
@@ -138,7 +138,7 @@
                             </div>
                         </li>
                     </ul>
-                    <button name="button-transaccion" class="btn btn-primary btn-lg btn-block"
+                    <button class="btn btn-primary btn-lg btn-block"
                         type="submit">Procesar</button>
                 </form>
             </div><!-- Final Seccion de Transacción -->
@@ -223,6 +223,7 @@
         var tipo_documento_selectId = "#" + "{{ cliente.tipo_documento.id_for_label }}"
         var crearClientr_formId = "#form-crear-cliente"
         var client_NotFound_id = "#client_NotFound_id"
+        var procesarTransaccion_formId= "#procesarTransaccion"
 
         $(crearClientr_formId).submit(function (event) {
             event.preventDefault();
@@ -234,6 +235,32 @@
             }, 0);
 
             Transaccion.add_cliente(data);
+
+        })
+        $(procesarTransaccion_formId).submit(function (event) {
+            event.preventDefault();
+            const array = $(this).serializeArray();
+
+            let data = {}
+            array.reduce(function (obj, item) {
+                data[item.name] = item.value;
+            }, 0);
+
+            const merge= Object.assign(data, Transaccion)
+            
+            $.ajax({
+                url: window.location.href,
+                type: "POST",
+                data: JSON.stringify(merge),
+                headers: {
+                    "X-Requested-Type": "procesar-transaccion",
+                    "Content-Type": "application/json; charset=utf-8",
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                success: function (data) {
+                    console.log(data)
+                },
+            });
 
         })
 

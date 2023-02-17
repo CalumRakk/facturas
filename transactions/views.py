@@ -8,9 +8,18 @@ from django.contrib.auth import login, authenticate, logout
 from django.views.generic import View
 from django.urls import reverse
 
-from .models import Derecho, Tramite, Cliente
+from .models import Derecho, Tramite, Cliente, Transaccion, Vehiculo
 from .form import TransaccionForm, TramiteForm, ClienteForm
 from .serializers import TramiteSerializer, ClienteSerializer
+from django.core.exceptions import ValidationError
+
+
+def buscar_objeto(Modelo, id_objeto):
+    try:
+        objeto = Modelo.objects.get(id=id_objeto)
+        return objeto
+    except Modelo.DoesNotExist:
+        return None
 
 def test(request):
     if request.method == "GET":
@@ -24,35 +33,78 @@ def test(request):
         """
         json_data = json.loads(request.body.decode("utf-8"))
 
-        num_documento_keyName= "num_documento"
-        tipo_documento_keyName= "tipo_documento"    
+        num_documento_keyName = "num_documento"
+        tipo_documento_keyName = "tipo_documento"
 
-        is_num_documento_exists = True if json_data.get(num_documento_keyName) else False
-        is_tipo_documento_exists=  True if json_data.get(tipo_documento_keyName) else False
-        
+        is_num_documento_exists = True if json_data.get(
+            num_documento_keyName) else False
+        is_tipo_documento_exists = True if json_data.get(
+            tipo_documento_keyName) else False
+
         if is_num_documento_exists and is_tipo_documento_exists:
-            num_documento=json_data[num_documento_keyName]
-            tipo_documento=json_data[tipo_documento_keyName]
-            
+            num_documento = json_data[num_documento_keyName]
+            tipo_documento = json_data[tipo_documento_keyName]
+
             if num_documento.isnumeric():
-                clientes= Cliente.objects.filter(num_documento=num_documento,tipo_documento=tipo_documento)                   
-                return JsonResponse(list(clientes.values()), safe=False)       
+                clientes = Cliente.objects.filter(
+                    num_documento=num_documento, tipo_documento=tipo_documento)
+                return JsonResponse(list(clientes.values()), safe=False)
         return JsonResponse([], safe=False)
-    
-    elif "create_user"== request.headers.get("X-Requested-Type"):
-        querydict= QueryDict(request.body)
-        cliente= ClienteForm(querydict)
+
+    elif "create_user" == request.headers.get("X-Requested-Type"):
+        querydict = QueryDict(request.body)
+        cliente = ClienteForm(querydict)
         if cliente.is_valid():
-            cliente= cliente.save()
+            cliente = cliente.save()
             serializer = ClienteSerializer(cliente)
             return JsonResponse(serializer.data, safe=False)
         return JsonResponse([], safe=False)
 
-    elif "button-transaccion" in request.POST:
-        form= TransaccionForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return redirect("transactions:dashboard")
+    elif "procesar-transaccion" == request.headers.get("X-Requested-Type"):
+        # Los datos de un modelo relacionado con Transacción deben enviarse deben ser un json (no un valor Id o otra cosa.)
+        # Ejemplo : data = {"cliente": {"id":"1"}} En este caso el modelo cliente tiene un Json y un campo `id`.
+        # Si el JSON del modelo contiene un campo `id` se da por hecho que el asesor selecciono y busco un objeto existente en la base de datos.
+        # Si el JSON del modelo no contiene un campo `id` se da por hecho que el JSON tiene los campos necesarios para crear un objeto de ese modelo.
+        custom_errors={}
+        data = json.loads(request.body)
+        
+        cliente= None
+        cliente_json= data.get('cliente')
+        if cliente_json is None or not isinstance(cliente_json, dict):
+            custom_errors.update({"cliente":"Cliente no está presente o no es un Json."})
+        
+        if cliente_json.get("id"):
+            cliente= buscar_objeto(Cliente, cliente_json.get("id"))
+        else:
+            clienteForm = ClienteForm(data=cliente_json)
+            if clienteForm.is_valid():
+                cliente = clienteForm.save(commit=False)
+            else:
+                custom_errors.update({"cliente": clienteForm.errors.as_text() })
+
+        if not isinstance(cliente, Cliente):
+            custom_errors.update({"cliente":"No se pudo crear ni instanciar un cliente con los datos enviados"})
+
+        if len(custom_errors.keys())>0:            
+            return JsonResponse(custom_errors, safe=False)
+        # En este punto ocurren dos cosas:
+        # Los objetos relacionados con Transaccion tienen sus datos validaos
+        # En caso que un objeto no tenga id es porque es un nuevo objeto que se debe guardar en DB antes de poder pasarselo a Transaccion.
+        if cliente.pk is None:
+            cliente.save()    
+      
+        data["cliente"]=cliente
+        data["vehiculo"]= Vehiculo.objects.get(id=data["vehiculo"])
+        data["tramite"]= Tramite.objects.get(id=data["tramite"])
+        data["valor_total"]= "1"     
+
+        transaction = TransaccionForm(data=data)
+        if transaction.is_valid():
+            transaction.save()
+            return JsonResponse({"redirect_url": reverse("transactions:test")})
+        return JsonResponse({'error': transaction.errors.as_text()}, status=400)       
+        
+
     elif "pre-select" in request.POST:
         registro_name = 'registro'
         clasificacion_name = 'clasificacion'
@@ -67,7 +119,7 @@ def test(request):
         tramite.fields[registro_name].widget.attrs['disabled'] = True
         tramite.fields[clasificacion_name].widget.attrs['disabled'] = True
         transaccion = TransaccionForm()
-        cliente= ClienteForm()
+        cliente = ClienteForm()
         return render(request, 'test-2.html', {"transaccion": transaccion, "tramite": tramite, "cliente": cliente})
 
 

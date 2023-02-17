@@ -19,7 +19,7 @@ class Cliente(models.Model):
     tipo_documento = models.CharField(
         max_length=2, choices=TipoDocumento.choices, default=TipoDocumento.CC
     )
-    num_documento = models.CharField(max_length=20)
+    num_documento = models.CharField(max_length=20, unique=True, db_index=True)
     telefono = models.CharField(max_length=20, blank=True)
 
     creado = models.DateTimeField(auto_now_add=True)
@@ -43,7 +43,7 @@ class Vehiculo(models.Model):
     tipo_vehiculo = models.CharField(
         max_length=50, choices=Clase.choices, default=Clase.AUTOMOVIL
     )
-    placa = models.CharField(max_length=20)
+    placa = models.CharField(max_length=20, unique=True, db_index=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
 
     creado = models.DateTimeField(auto_now_add=True)
