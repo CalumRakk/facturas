@@ -5,6 +5,9 @@
 
 
 {% block head %}
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <style>
     .container {
         max-width: 960px;
@@ -29,6 +32,22 @@
     .lh-condensed {
         line-height: 1.25;
     }
+
+    .message-container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        padding: 10px;
+        display: none;
+    }
+
+    .message {
+        margin: 0;
+        color: red;
+    }
 </style>
 {% endblock head %}
 
@@ -45,7 +64,6 @@
             </ol>
         </nav>
     </div><!-- End Page Title -->
-
     <div class="container">
         <div class="row">
             <div class="col-md-4 order-md-2 mb-4"><!-- Seccion de Transacción -->
@@ -128,44 +146,64 @@
 
             <div class="col-md-8 order-md-1">
                 <h4 class="mb-3">Cliente</h4>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <input class="form-control" type="search" id="input-search-cliente" name="query" placeholder="N.documento "
-                            title="Buscar Cliente">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <button class="btn btn-secondary" title="Search" id="button-search-cliente"><i class="bi bi-search"></i>Buscar</button>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <div id="dialog-form" title="Registrar nuevo Cliente">
-                            <form id="my-form" method="post">
-                                <fieldset>
-                                    {{ cliente }}
-                                    <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-                                </fieldset>
-                            </form>
+                <div id="acordeon-cliente">
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                    Registrar nuevo Cliente
+                                </button>
+                            </h5>
                         </div>
-                        <button class="btn btn-secondary" id="create-user" class="">Crear Cliente</button>
-                    </div>
 
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                            data-parent="#acordeon-cliente">
+                            <div class="card-body">
+                                <form id="form-crear-cliente">
+                                    {{ cliente.as_p }}
+                                    <button>Vincular</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+                                    aria-expanded="false" aria-controls="collapseTwo">
+                                    Vincular Cliente existente
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                            data-parent="#acordeon-cliente">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        {{ cliente.tipo_documento }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <input class="form-control" type="search" id="input-search-cliente" name="query"
+                                            placeholder="N.documento " title="Buscar Cliente">
+                                        <div id="client_NotFound_id" class="message-container">
+                                            <p>Cliente no encontrado.</p>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <button class="btn btn-secondary" title="Search" id="button-search-cliente"><i
+                                                class="bi bi-search"></i>Buscar y vincular</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="row">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>T. documento</th>
-                                <th>N. Documento</th>
-                                <th>Opciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-                <hr class="mb-4">
-                <h4 class="mb-3">Tramite</h4>
-                <hr class="mb-4">
+
             </div>
         </div>
     </div>
@@ -176,53 +214,75 @@
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<script src="{% static 'transactions/js/transactions/cliente.js' %}"> </script>
 <script>
     $(function () {
-        const CrearCliente_btnId = "#create-user";
-        const DialogoForm_Id = "#dialog-form";
 
-        const crear_user = () => {
-            var formData = $('#my-form').serialize();
+        var buscarCliente_inputId = "#input-search-cliente";
+        var buscarCliente_btnId = "#button-search-cliente";
+        var displayTransaccion_cliente = "#client-name-container";
+        var tipo_documento_selectId = "#" + "{{ cliente.tipo_documento.id_for_label }}"
+        var crearClientr_formId = "#form-crear-cliente"
+        var client_NotFound_id = "#client_NotFound_id"
+
+        $(crearClientr_formId).submit(function (event) {
+            event.preventDefault();
+            const array = $(this).serializeArray();
+
+            let data = {}
+            array.reduce(function (obj, item) {
+                data[item.name] = item.value;
+            }, 0);
+
+            Transaccion.add_cliente(data);
+
+        })
+
+        const Transaccion = {
+            add_cliente: function (data) {
+                // Recibe un objeto
+                this.cliente = data;
+                $(displayTransaccion_cliente).text(data.nombre || "");
+                // $(displayTransaccion_cliente).next().val(data.id || "")
+            }
+        }
+
+        const Messages = {
+            is_open: false,
+            client_NotFound_id: client_NotFound_id,
+
+            msg_ClientNotFound: function () {
+                if (this.is_open == false) {
+                    this.is_open = true;
+                    $(client_NotFound_id).fadeIn().delay(2000).fadeOut(function () {
+                        this.is_open = false;
+                    }.bind(this));
+                }
+            }
+        }
+        $(buscarCliente_btnId).click(function () {
+            const num_documento = $(buscarCliente_inputId).val()
+            const tipo_documento = $(tipo_documento_selectId).val()
             $.ajax({
                 url: window.location.href,
-                type: 'POST',
-                data: formData,
+                type: "POST",
+                data: JSON.stringify({ "num_documento": num_documento, "tipo_documento": tipo_documento }),
                 headers: {
-                    "X-Requested-Type": "create_user",
+                    "X-Requested-Type": "buscar-cliente",
                     "Content-Type": "application/json; charset=utf-8",
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 },
                 success: function (data) {
-                    cliente_transaccion.set(data)
-                    dialog.dialog("close");
-                    form[0].reset();
-                }
+                    if (data.length == 0) {
+                        Messages.msg_ClientNotFound()
+                        Transaccion.add_cliente({})
+                    } else {
+                        Transaccion.add_cliente(data[0])
+                    }
+                },
             });
-        }
-
-        const dialog = $(DialogoForm_Id).dialog({
-            autoOpen: false,
-
-            modal: true,
-            buttons: {
-                "Crear Cliente": crear_user,
-                Cancel: function () {
-                    dialog.dialog("close");
-                }
-            },
-            close: function () {
-                form[0].reset();
-            }
         });
 
-        const form = dialog.find("form").on("submit", function (event) {
-            event.preventDefault();
-        });
 
-        $(CrearCliente_btnId).on("click", function () {
-            dialog.dialog("open");
-        });
     });
 </script>
 {% endblock content %}

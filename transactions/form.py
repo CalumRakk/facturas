@@ -7,6 +7,8 @@ class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
         fields = '__all__'
+    tipo_documento= forms.ChoiceField(label='T. Documento', choices=Cliente.TipoDocumento.choices, widget=forms.Select(
+        attrs={"class": "form-select form-select-sm w-auto"}))
 class TramiteForm(forms.ModelForm):
     class Meta:
         model = Tramite

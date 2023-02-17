@@ -17,18 +17,26 @@ def test(request):
         form = TramiteForm()
         return render(request, 'test.html', {"form": form})
 
-    elif "autocomplete" == request.headers.get("X-Requested-Type"):
+    elif "buscar-cliente" == request.headers.get("X-Requested-Type"):
+        """Devuelve un Array de Clientes.
+        Nota: en el Ajax es donde se debe obtener el primer elemento del array. Esto es así, porque
+        es más facil comprobar si se ha devuelto datos en un array que comprobar si el objeto tiene datos o está vacio.
+        """
         json_data = json.loads(request.body.decode("utf-8"))
 
-        key_name = "query"
-        n_documento = json_data[key_name]
-        is_field_exist = True if json_data.get(key_name) else False
-        tipo_documento= Cliente.TipoDocumento.choices[0][0]
+        num_documento_keyName= "num_documento"
+        tipo_documento_keyName= "tipo_documento"    
 
-        if is_field_exist and n_documento.isnumeric():
-            queryset = Cliente.objects.filter(num_documento=n_documento,tipo_documento=tipo_documento )
-            serializer = ClienteSerializer(queryset, many=True)
-            return JsonResponse(serializer.data, safe=False)
+        is_num_documento_exists = True if json_data.get(num_documento_keyName) else False
+        is_tipo_documento_exists=  True if json_data.get(tipo_documento_keyName) else False
+        
+        if is_num_documento_exists and is_tipo_documento_exists:
+            num_documento=json_data[num_documento_keyName]
+            tipo_documento=json_data[tipo_documento_keyName]
+            
+            if num_documento.isnumeric():
+                clientes= Cliente.objects.filter(num_documento=num_documento,tipo_documento=tipo_documento)                   
+                return JsonResponse(list(clientes.values()), safe=False)       
         return JsonResponse([], safe=False)
     
     elif "create_user"== request.headers.get("X-Requested-Type"):
