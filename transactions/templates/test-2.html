@@ -138,8 +138,7 @@
                             </div>
                         </li>
                     </ul>
-                    <button class="btn btn-primary btn-lg btn-block"
-                        type="submit">Procesar</button>
+                    <button class="btn btn-primary btn-lg btn-block" type="submit">Procesar</button>
                 </form>
             </div><!-- Final Seccion de Transacción -->
 
@@ -147,26 +146,6 @@
             <div class="col-md-8 order-md-1">
                 <h4 class="mb-3">Cliente</h4>
                 <div id="acordeon-cliente">
-                    <div class="card">
-                        <div class="card-header" id="headingOne">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne"
-                                    aria-expanded="true" aria-controls="collapseOne">
-                                    Registrar nuevo Cliente
-                                </button>
-                            </h5>
-                        </div>
-
-                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
-                            data-parent="#acordeon-cliente">
-                            <div class="card-body">
-                                <form id="form-crear-cliente">
-                                    {{ cliente.as_p }}
-                                    <button>Vincular</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
                     <div class="card">
                         <div class="card-header" id="headingTwo">
                             <h5 class="mb-0">
@@ -176,7 +155,7 @@
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo"
                             data-parent="#acordeon-cliente">
                             <div class="card-body">
                                 <div class="row">
@@ -202,8 +181,29 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                    Registrar nuevo Cliente
+                                </button>
+                            </h5>
+                        </div>
 
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne"
+                            data-parent="#acordeon-cliente">
+                            <div class="card-body">
+                                <form id="form-crear-cliente">
+                                    {{ cliente.as_p }}
+                                    <button>Vincular</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mb-4">
+                <h4 class="mb-3">Vehiculo</h4>
             </div>
         </div>
     </div>
@@ -223,7 +223,7 @@
         var tipo_documento_selectId = "#" + "{{ cliente.tipo_documento.id_for_label }}"
         var crearClientr_formId = "#form-crear-cliente"
         var client_NotFound_id = "#client_NotFound_id"
-        var procesarTransaccion_formId= "#procesarTransaccion"
+        var procesarTransaccion_formId = "#procesarTransaccion"
 
         $(crearClientr_formId).submit(function (event) {
             event.preventDefault();
@@ -246,8 +246,8 @@
                 data[item.name] = item.value;
             }, 0);
 
-            const merge= Object.assign(data, Transaccion)
-            
+            const merge = Object.assign(data, Transaccion)
+
             $.ajax({
                 url: window.location.href,
                 type: "POST",
