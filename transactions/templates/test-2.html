@@ -10,7 +10,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <style>
     .container {
-        max-width: 960px;
+        max-width: 1080px;
     }
 
     .border-top {
@@ -79,19 +79,17 @@
 
                         <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Cliente -->
                             <div>
-                                <h6 class="my-0">Cliente</h6>
-                                <small class="form-control-plaintext text-muted"
-                                    id="client-name-container">Ninguno.</small>
-                                <input type="hidden" name="{{ transaccion.cliente.name }}" value="" readonly>
-
+                                <h6 class="my-0" id="display-cliente">Cliente</h6>
+                                <small class="form-control-plaintext text-muted">Sin asignar</small>
+                                <small class="form-control-plaintext text-muted"></small>
                             </div>
                         </li><!-- Fin Cliente -->
 
                         <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Registro -->
                             <div>
-                                <h6 class="my-0"> {{ tramite.registro.label }}</h6>
-                                <input class="form-control-plaintext text-muted"
-                                    value="{{ tramite.registro.value | upper }}" readonly>
+                                <h6 class="my-0" id="display-vehiculo"> Vehiculo</h6>
+                                <small class="form-control-plaintext text-muted">Sin asignar</small>
+                                <small class="form-control-plaintext text-muted"></small>
                             </div>
                         </li><!-- Fin Registro -->
 
@@ -151,7 +149,7 @@
                             <h5 class="mb-0">
                                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
                                     aria-expanded="false" aria-controls="collapseTwo">
-                                    Vincular Cliente existente
+                                    añadir Cliente existente
                                 </button>
                             </h5>
                         </div>
@@ -159,13 +157,13 @@
                             data-parent="#acordeon-cliente">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-3 mb-3">
-                                        {{ cliente.tipo_documento }}
-                                    </div>
+                                    <div>{{ cliente.tipo_documento.label }}
+
+                                        {{ cliente.tipo_documento }}</div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <input class="form-control" type="search" id="input-search-cliente" name="query"
+                                        <input class="form-control" type="search" id="buscar-cliente-input" name="query"
                                             placeholder="N.documento " title="Buscar Cliente">
                                         <div id="client_NotFound_id" class="message-container">
                                             <p>Cliente no encontrado.</p>
@@ -173,8 +171,8 @@
 
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <button class="btn btn-secondary" title="Search" id="button-search-cliente"><i
-                                                class="bi bi-search"></i>Buscar y vincular</button>
+                                        <button class="btn btn-secondary" title="Search" id="buscar-cliente-button"><i
+                                                class="bi bi-search"></i>Buscar y añadir</button>
                                     </div>
 
                                 </div>
@@ -196,14 +194,36 @@
                             <div class="card-body">
                                 <form id="form-crear-cliente">
                                     {{ cliente.as_p }}
-                                    <button>Vincular</button>
+                                    <button class="btn btn-success">crear</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr class="mb-4">
+
                 <h4 class="mb-3">Vehiculo</h4>
+
+                <form id="crear-vehiculo-form">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ vehiculo.tipo_vehiculo.label }}
+                            {{ vehiculo.tipo_vehiculo }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <!-- <input class="form-control" type="text" id="buscar-vehiculo-input" placeholder="N. Placa "> -->
+                            {{ vehiculo.placa }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button type="button" class="btn btn-secondary" id="buscar-vehiculo-button"><i
+                                    class="bi bi-search"></i>Buscar
+                                y añadir</button>
+                            <button type="submit" class="btn btn-success"></i>Crear</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -217,13 +237,37 @@
 <script>
     $(function () {
 
-        var buscarCliente_inputId = "#input-search-cliente";
-        var buscarCliente_btnId = "#button-search-cliente";
-        var displayTransaccion_cliente = "#client-name-container";
-        var tipo_documento_selectId = "#" + "{{ cliente.tipo_documento.id_for_label }}"
+        var buscarCliente_inputId = "#buscar-cliente-input";
+        var buscarCliente_btnId = "#buscar-cliente-button";
         var crearClientr_formId = "#form-crear-cliente"
+        var displayCliente = "#display-cliente";
+
+        var buscarVehiculo_inputId = "#buscar-vehiculo-input";
+        var buscarVehiculo_btnId = "#buscar-vehiculo-button";
+        var crear_vehiculo_formId = "#crear-vehiculo-form"        
+        var displayVehiculo = "#display-vehiculo";
+
+        var tipo_documento_selectId = "#" + "{{ cliente.tipo_documento.id_for_label }}"
         var client_NotFound_id = "#client_NotFound_id"
         var procesarTransaccion_formId = "#procesarTransaccion"
+
+        const form_to_object = (formJQuery) => {
+            // formJQuery debe ser un objeto jQuery, ejemplo: se deberia pasar así $(this)
+            const array = formJQuery.serializeArray();
+
+            let data = {}
+            array.reduce(function (obj, item) {
+                data[item.name] = item.value;
+            }, 0);
+            return data
+        }
+        
+        $(crear_vehiculo_formId).submit(function (event) {
+            event.preventDefault();
+            data = form_to_object($(this));
+            console.log(data);
+            Transaccion.add_vehiculo(data)
+        })
 
         $(crearClientr_formId).submit(function (event) {
             event.preventDefault();
@@ -237,6 +281,7 @@
             Transaccion.add_cliente(data);
 
         })
+
         $(procesarTransaccion_formId).submit(function (event) {
             event.preventDefault();
             const array = $(this).serializeArray();
@@ -268,9 +313,22 @@
             add_cliente: function (data) {
                 // Recibe un objeto
                 this.cliente = data;
-                $(displayTransaccion_cliente).text(data.nombre || "");
-                // $(displayTransaccion_cliente).next().val(data.id || "")
+                if ($.isEmptyObject(data) == false) {
+                    sibling = $(displayCliente).nextAll();
+                    const nombre = data.nombre + " " + data.apellido
+                    const documento = data.tipo_documento + ". " + data.num_documento
+                    sibling[0].innerText = nombre
+                    sibling[1].innerText = documento
+                }
+            },
+            add_vehiculo: function(data){
+                this.vehiculo= data
+                if ($.isEmptyObject(data) == false) {
+                    const string = data.tipo_vehiculo + " - " + data.placa.toUpperCase()
+                    $(displayVehiculo).next().text(string);                    
+                }
             }
+        
         }
 
         const Messages = {
@@ -286,9 +344,12 @@
                 }
             }
         }
+        
+        
         $(buscarCliente_btnId).click(function () {
             const num_documento = $(buscarCliente_inputId).val()
             const tipo_documento = $(tipo_documento_selectId).val()
+            
             $.ajax({
                 url: window.location.href,
                 type: "POST",
@@ -305,6 +366,25 @@
                     } else {
                         Transaccion.add_cliente(data[0])
                     }
+                },
+            });
+        });
+        
+        $(buscarVehiculo_btnId).click(function () {
+            const id_tipo_vehiculo = $("#id_tipo_vehiculo").val()
+            const id_placa = $("#id_placa").val()
+            
+            $.ajax({
+                url: window.location.href,
+                type: "POST",
+                data: JSON.stringify({ "placa": id_placa, "tipo_vehiculo": id_tipo_vehiculo }),
+                headers: {
+                    "X-Requested-Type": "buscar-vehiculo",
+                    "Content-Type": "application/json; charset=utf-8",
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                success: function (data) {
+                    console.log(data)
                 },
             });
         });

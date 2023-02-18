@@ -9,10 +9,11 @@ from django.views.generic import View
 from django.urls import reverse
 
 from .models import Derecho, Tramite, Cliente, Transaccion, Vehiculo
-from .form import TransaccionForm, TramiteForm, ClienteForm
+from .form import TransaccionForm, TramiteForm, ClienteForm, VehiculoForm
 from .serializers import TramiteSerializer, ClienteSerializer
 from django.core.exceptions import ValidationError
-from .utils import checker, buscar_objeto
+from .utils import checker, buscar_objeto, search_in_model
+
 
 
 def test(request):
@@ -21,10 +22,6 @@ def test(request):
         return render(request, 'test.html', {"form": form})
 
     elif "buscar-cliente" == request.headers.get("X-Requested-Type"):
-        """Devuelve un Array de Clientes.
-        Nota: en el Ajax es donde se debe obtener el primer elemento del array. Esto es así, porque
-        es más facil comprobar si se ha devuelto datos en un array que comprobar si el objeto tiene datos o está vacio.
-        """
         json_data = json.loads(request.body.decode("utf-8"))
 
         num_documento_keyName = "num_documento"
@@ -44,6 +41,12 @@ def test(request):
                     num_documento=num_documento, tipo_documento=tipo_documento)
                 return JsonResponse(list(clientes.values()), safe=False)
         return JsonResponse([], safe=False)
+    
+    elif "buscar-vehiculo" == request.headers.get("X-Requested-Type"):
+        json_data = json.loads(request.body.decode("utf-8"))
+        fields=["tipo_vehiculo", "placa"]
+        vehiculo= search_in_model(json_data, fields, Vehiculo)
+        return JsonResponse(vehiculo, safe=False)
 
     elif "create_user" == request.headers.get("X-Requested-Type"):
         querydict = QueryDict(request.body)
@@ -98,7 +101,14 @@ def test(request):
         tramite.fields[clasificacion_name].widget.attrs['disabled'] = True
         transaccion = TransaccionForm()
         cliente = ClienteForm()
-        return render(request, 'test-2.html', {"transaccion": transaccion, "tramite": tramite, "cliente": cliente})
+        vehiculo= VehiculoForm()
+        context={
+            "transaccion": transaccion, 
+            "tramite": tramite, 
+            "cliente": cliente,
+            "vehiculo":vehiculo
+        }
+        return render(request, 'test-2.html', context)
 
 
 def signout(request: HttpRequest):

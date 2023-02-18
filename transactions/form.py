@@ -3,6 +3,16 @@ from django import forms
 from .models import Transaccion, Tramite, Vehiculo, Cliente
 
 
+class VehiculoForm(forms.ModelForm):    
+    class Meta:
+        model = Vehiculo
+        fields = '__all__'
+    
+    tipo_vehiculo= forms.ChoiceField(label='Tipo de Vehiculo', choices=Vehiculo.Clase.choices, widget=forms.Select(
+        attrs={"class": "form-select form-select-sm w-auto"}))
+
+    placa= forms.CharField(max_length=20, label="Placa", widget=forms.TextInput(attrs={"class": "form-control", "placeholder":"N. Placa "}))
+
 class ClienteForm(forms.ModelForm):    
     class Meta:
         model = Cliente

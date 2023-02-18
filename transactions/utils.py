@@ -5,6 +5,26 @@ from django.db.models import Model
 from typing import Union
 
 
+def search_in_model(data: dict, field_names: list, modelo: Model) -> list:
+    """La función busca un objeto en el modelo dado y devuelve un array.
+
+    La función intenta buscar un objeto en el modelo de Django dato `modelo`,
+    utilizando los valores proporcionados en el json `data` y la lista de nombres de campos validos `field_name`.
+
+    - field_names : es una lista de nombre de campos que deben existir en el json data y que se usará para filtrar la busqueda en el modelo.
+    """
+    filtro = {}
+    for keyname in field_names:
+        if data.get(keyname) is None:
+            return []
+        filtro.update({keyname: data.get(keyname)})
+    try:
+        queryset = modelo.objects.filter(**filtro)
+        return list(queryset.values())
+    except modelo.DoesNotExist:
+        return []
+
+
 def buscar_objeto(modelo: Union[Model, ModelForm], id_objeto) -> Union[Model, None]:
     """La función trata de encontrar un objeto específico del modelo dado, usando su id. 
     Si el objeto existe, la función devuelve el objeto. Si el objeto no existe, la función devuelve None.
@@ -14,7 +34,7 @@ def buscar_objeto(modelo: Union[Model, ModelForm], id_objeto) -> Union[Model, No
         id_objeto: el id que se buscará en la Clase del modelo.
     """
     try:
-        if id_objeto=="":
+        if id_objeto == "":
             return None
         if issubclass(modelo, ModelForm):
             modelo = modelo.Meta.model
