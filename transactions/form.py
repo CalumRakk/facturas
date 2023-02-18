@@ -23,11 +23,12 @@ class TramiteForm(forms.ModelForm):
     class Meta:
         model = Tramite
         fields = '__all__'
-
+    
+    nombre= forms.CharField(max_length=20, label="Nombre de Tramite", widget=forms.TextInput(attrs={"id":"id_nombre_tramite","class": "form-control", "placeholder":"Nombre del tramite "}))
     registro = forms.ChoiceField(label='Registro Nacional', choices=Tramite.RegistroNacional.choices, widget=forms.Select(
         attrs={"class": "custom-select d-block w-100 p-2"}))
-    clasificacion = forms.ChoiceField(label='Tipo de Vehiculo', choices=Vehiculo.Clase.choices, widget=forms.Select(
-        attrs={"class": "custom-select d-block w-100 p-2"}))
+    # clasificacion = forms.ChoiceField(label='Tipo de Vehiculo', choices=Vehiculo.Clase.choices, widget=forms.Select(
+    #     attrs={"class": "custom-select d-block w-100 p-2"}))
 
 
 class TransaccionForm(forms.ModelForm):

@@ -17,9 +17,6 @@ $(function () {
     var filtro_tipo_vehiculo_idselect = "#id_tipo_vehiculo"
     var contenedor_VehiculoNotFound = "#contenedor_VehiculoNotFound"
 
-
-
-
     var procesarTransaccion_formId = "#procesarTransaccion"
 
     const form_to_object = (formJQuery) => {
@@ -99,7 +96,13 @@ $(function () {
                 $(displayVehiculo).next().text(string);
             }
         }
-
+        add_tramites: function(data){
+            this.vehiculo = data
+            if ($.isEmptyObject(data) == false) {
+                const string = data.tipo_vehiculo + " - " + data.placa.toUpperCase()
+                $(displayVehiculo).next().text(string);
+            }
+        }
     }
 
     const Messages = {
@@ -166,6 +169,31 @@ $(function () {
                     Transaccion.add_vehiculo({})
                 } else {
                     Transaccion.add_vehiculo(data[0])
+                }
+            },
+        });
+    });
+
+    $("#buscarTramite_btnId").click(function () {
+        const nombre= $("#id_nombre_tramite").val()
+        const registro = $("#id_registro").val()
+        const clasificacion = $("#id_tipo_vehiculo").val() // TEMPORAL, SE DEBE CONFIRMAR SI SE HA AÑADIDO UN VEHICULO ANTES DE PERMITIR BUSCAR.
+        
+        $.ajax({
+            url: window.location.href,
+            type: "POST",
+            data: JSON.stringify({"nombre":nombre, "registro": registro, "clasificacion": clasificacion }),
+            headers: {
+                "X-Requested-Type": "buscar-tramite",
+                "Content-Type": "application/json; charset=utf-8",
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            success: function (data) {
+                if (data.length == 0) {
+                    Messages.msg_TramiteNotFound()
+                    Transaccion.add_tramites([])
+                } else {
+                    Transaccion.add_tramites(data[0])
                 }
             },
         });

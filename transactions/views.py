@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.views.generic import View
 from django.urls import reverse
+from django.forms.models import model_to_dict
 
 from .models import Tramite, Cliente, Vehiculo
 from .form import TransaccionForm, TramiteForm, ClienteForm, VehiculoForm
@@ -81,6 +82,7 @@ class Transaccion_view(View):
 
     def post(self, request):
         if "buscar-cliente" == request.headers.get("X-Requested-Type"):
+            # FIXME: AÑADIR LA BUSQUEDA COMO EXACTA EN EL N. DOCUMENTO.
             json_data = json.loads(request.body.decode("utf-8"))
 
             num_documento_keyName = "num_documento"
@@ -103,9 +105,20 @@ class Transaccion_view(View):
         
         elif "buscar-vehiculo" == request.headers.get("X-Requested-Type"):
             json_data = json.loads(request.body.decode("utf-8"))
-            fields=["tipo_vehiculo", "placa__icontains"]
+            fields=["tipo_vehiculo", "placa__iexact"]
             vehiculo= search_in_model(json_data, fields, Vehiculo)
             return JsonResponse(vehiculo, safe=False)
+        elif "buscar-tramite" == request.headers.get("X-Requested-Type"):
+            json_data = json.loads(request.body.decode("utf-8"))
+            fields=["registro", "nombre__icontains", "clasificacion"]
+            queryset= search_in_model(json_data, fields, Tramite, queryset=True)
+            tramies=[]
+            for tramite in queryset:
+                derechos= tramite.derechos.values()                
+                diccionario = model_to_dict(tramite)
+                diccionario["derechos"]= list(derechos)
+                tramies.append(diccionario)
+            return JsonResponse(tramies, safe=False)
 
         elif "procesar-transaccion" == request.headers.get("X-Requested-Type"):
             # FIXME: añadir un limitar de cuantos transsaciones puede hacer un cliente.

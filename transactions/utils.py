@@ -5,7 +5,7 @@ from django.db.models import Model
 from typing import Union
 
 
-def search_in_model(data: dict, field_names: list, model: Model) -> list:
+def search_in_model(data: dict, field_names: list, model: Model, queryset=False) -> list:
     """La función busca un objeto en el modelo usando los campos y filtros dados y devuelve un array.
 
     La idea es que en el backend se especique los campos y los filtros permitidos para hacer la consulta en el modelo dado, y en el
@@ -39,8 +39,10 @@ def search_in_model(data: dict, field_names: list, model: Model) -> list:
         filter.update({field:value})
     
     try:
-        queryset = model.objects.filter(**filter)
-        return list(queryset.values())
+        result = model.objects.filter(**filter)
+        if queryset==True:
+            return result
+        return list(result.values())
     except model.DoesNotExist:
         return []
 

@@ -48,7 +48,8 @@
         margin: 0;
         color: red;
     }
-    .caja{
+
+    .caja {
         position: relative;
     }
 </style>
@@ -95,32 +96,17 @@
                                 <small class="form-control-plaintext text-muted"></small>
                             </div>
                         </li><!-- Fin Registro -->
-
-                        <li class="list-group-item d-flex justify-content-between lh-condensed">
-                            <div>
-                                {{ transaccion.tramite }}
-                            </div>
-                        </li>
+<!-- 
                         <li class="list-group-item d-flex justify-content-between lh-condensed">
                             <div>
                                 {{ transaccion.estado }}
                             </div>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between lh-condensed">
-                            <div>
-                                {{ transaccion.creado }}
-                            </div>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between lh-condensed">
-                            <div>
-                                {{ transaccion.actualizado }}
-                            </div>
-                        </li>
+                        </li>    
                         <li class="list-group-item d-flex justify-content-between lh-condensed">
                             <div>
                                 {{ transaccion.valor_total }}
                             </div>
-                        </li>
+                        </li> -->
                     </ul>
                     <button class="btn btn-primary btn-lg btn-block" type="submit">Procesar</button>
                 </form>
@@ -187,7 +173,7 @@
                     </div>
                 </div>
 
-                <hr class="mb-4">                
+                <hr class="mb-4">
 
                 <div class="caja">
                     <h4 class="mb-3">Vehiculo</h4>
@@ -207,16 +193,71 @@
                             <div class="col-md-6 mb-3">
                                 <button type="button" class="btn btn-secondary" id="buscar-vehiculo-button"><i
                                         class="bi bi-search"></i>Buscar
-                                    y añadir</button>                            
+                                    y añadir</button>
                                 <button type="submit" class="btn btn-success"></i>Crear</button>
                             </div>
-                            
+
                         </div>
                         <div id="contenedor_VehiculoNotFound" class="message-container">
                             <p>Vehiculo no encontrado.</p>
                         </div>
                     </form>
                 </div>
+
+                <hr class="mb-4">
+                <div class="caja">
+                    <h4 class="mb-3">Tramite</h4>
+                    <form id="crear-vehiculo-form" style="position: static;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ tramite.registro.label }}
+                                {{ tramite.registro }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <!-- <input class="form-control" type="text" id="id_nombre" placeholder="nombre del tramite."> -->
+                                {{ tramite.nombre }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <button type="button" class="btn btn-secondary" id="buscarTramite_btnId"><i
+                                        class="bi bi-search"></i>Buscar</button>
+                            </div>
+                        </div>
+                        <div id="contenedor_VehiculoNotFound" class="message-container">
+                            <p>Vehiculo no encontrado.</p>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                            <th>Email</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>John</td>
+                            <td>Doe</td>
+                            <td>john@example.com</td>
+                          </tr>
+                          <tr>
+                            <td>Mary</td>
+                            <td>Moe</td>
+                            <td>mary@example.com</td>
+                          </tr>
+                          <tr>
+                            <td>July</td>
+                            <td>Dooley</td>
+                            <td>july@example.com</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                </div>
+
             </div>
         </div>
     </div>
