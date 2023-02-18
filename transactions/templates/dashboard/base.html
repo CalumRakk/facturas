@@ -40,17 +40,17 @@
         </a>
       </li><!-- End Dashboard Nav -->
 
-      <li class="nav-item">
+      {% comment %} <li class="nav-item">
         <a class="nav-link collapsed" data-bs-target="#components-nav" href="{% url 'transactions:tramite' %}">
           <i class="bi bi-menu-button-wide"></i>
           <span>Crear Tramite</span>
         </a>
-      </li><!-- End Components Nav -->
+      </li><!-- End Components Nav --> {% endcomment %}
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" href="{% url 'transactions:test' %}">
+        <a class="nav-link collapsed" data-bs-target="#components-nav" href="{% url 'transactions:transaccion' %}">
           <i class="bi bi-menu-button-wide"></i>
-          <span>Test</span>
+          <span>Transacción</span>
         </a>
       </li><!-- End Components Nav -->
 
