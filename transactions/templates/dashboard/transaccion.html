@@ -37,7 +37,7 @@
         position: absolute;
         top: 0;
         right: 0;
-        width: 200px;
+        /* width: 200px; */
         background-color: #f5f5f5;
         border: 1px solid #ccc;
         padding: 10px;
@@ -47,6 +47,9 @@
     .message {
         margin: 0;
         color: red;
+    }
+    .caja{
+        position: relative;
     }
 </style>
 {% endblock head %}
@@ -93,23 +96,6 @@
                             </div>
                         </li><!-- Fin Registro -->
 
-                        <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Clasificacion -->
-                            <div>
-                                <h6 class="my-0"> {{ tramite.clasificacion.label }}</h6>
-                                <input class="form-control-plaintext text-muted" name="{{ tramite.clasificacion.name }}"
-                                    type="text" value="{{ tramite.clasificacion.value | upper }}" readonly>
-
-                            </div>
-
-                        </li><!-- Fin Clasificacion -->
-
-                        <li class="list-group-item d-flex justify-content-between lh-condensed">
-                            <div>
-                                {{ transaccion.vehiculo }}
-
-                            </div>
-
-                        </li>
                         <li class="list-group-item d-flex justify-content-between lh-condensed">
                             <div>
                                 {{ transaccion.tramite }}
@@ -200,30 +186,37 @@
                         </div>
                     </div>
                 </div>
-                <hr class="mb-4">
 
-                <h4 class="mb-3">Vehiculo</h4>
+                <hr class="mb-4">                
 
-                <form id="crear-vehiculo-form">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            {{ vehiculo.tipo_vehiculo.label }}
-                            {{ vehiculo.tipo_vehiculo }}
+                <div class="caja">
+                    <h4 class="mb-3">Vehiculo</h4>
+
+                    <form id="crear-vehiculo-form" style="position: static;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ vehiculo.tipo_vehiculo.label }}
+                                {{ vehiculo.tipo_vehiculo }}
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <!-- <input class="form-control" type="text" id="buscar-vehiculo-input" placeholder="N. Placa "> -->
-                            {{ vehiculo.placa }}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <!-- <input class="form-control" type="text" id="buscar-vehiculo-input" placeholder="N. Placa "> -->
+                                {{ vehiculo.placa }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <button type="button" class="btn btn-secondary" id="buscar-vehiculo-button"><i
+                                        class="bi bi-search"></i>Buscar
+                                    y añadir</button>                            
+                                <button type="submit" class="btn btn-success"></i>Crear</button>
+                            </div>
+                            
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <button type="button" class="btn btn-secondary" id="buscar-vehiculo-button"><i
-                                    class="bi bi-search"></i>Buscar
-                                y añadir</button>
-                            <button type="submit" class="btn btn-success"></i>Crear</button>
+                        <div id="contenedor_VehiculoNotFound" class="message-container">
+                            <p>Vehiculo no encontrado.</p>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -234,162 +227,5 @@
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<script>
-    $(function () {
-
-        var buscarCliente_inputId = "#buscar-cliente-input";
-        var buscarCliente_btnId = "#buscar-cliente-button";
-        var crearClientr_formId = "#form-crear-cliente"
-        var displayCliente = "#display-cliente";
-
-        var buscarVehiculo_inputId = "#buscar-vehiculo-input";
-        var buscarVehiculo_btnId = "#buscar-vehiculo-button";
-        var crear_vehiculo_formId = "#crear-vehiculo-form"        
-        var displayVehiculo = "#display-vehiculo";
-
-        var tipo_documento_selectId = "#" + "{{ cliente.tipo_documento.id_for_label }}"
-        var client_NotFound_id = "#client_NotFound_id"
-        var procesarTransaccion_formId = "#procesarTransaccion"
-
-        const form_to_object = (formJQuery) => {
-            // formJQuery debe ser un objeto jQuery, ejemplo: se deberia pasar así $(this)
-            const array = formJQuery.serializeArray();
-
-            let data = {}
-            array.reduce(function (obj, item) {
-                data[item.name] = item.value;
-            }, 0);
-            return data
-        }
-        
-        $(crear_vehiculo_formId).submit(function (event) {
-            event.preventDefault();
-            data = form_to_object($(this));
-            console.log(data);
-            Transaccion.add_vehiculo(data)
-        })
-
-        $(crearClientr_formId).submit(function (event) {
-            event.preventDefault();
-            const array = $(this).serializeArray();
-
-            let data = {}
-            array.reduce(function (obj, item) {
-                data[item.name] = item.value;
-            }, 0);
-
-            Transaccion.add_cliente(data);
-
-        })
-
-        $(procesarTransaccion_formId).submit(function (event) {
-            event.preventDefault();
-            const array = $(this).serializeArray();
-
-            let data = {}
-            array.reduce(function (obj, item) {
-                data[item.name] = item.value;
-            }, 0);
-
-            const merge = Object.assign(data, Transaccion)
-
-            $.ajax({
-                url: window.location.href,
-                type: "POST",
-                data: JSON.stringify(merge),
-                headers: {
-                    "X-Requested-Type": "procesar-transaccion",
-                    "Content-Type": "application/json; charset=utf-8",
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                success: function (data) {
-                    alert(JSON.stringify(data))
-                },
-            });
-
-        })
-
-        const Transaccion = {
-            add_cliente: function (data) {
-                // Recibe un objeto
-                this.cliente = data;
-                if ($.isEmptyObject(data) == false) {
-                    sibling = $(displayCliente).nextAll();
-                    const nombre = data.nombre + " " + data.apellido
-                    const documento = data.tipo_documento + ". " + data.num_documento
-                    sibling[0].innerText = nombre
-                    sibling[1].innerText = documento
-                }
-            },
-            add_vehiculo: function(data){
-                this.vehiculo= data
-                if ($.isEmptyObject(data) == false) {
-                    const string = data.tipo_vehiculo + " - " + data.placa.toUpperCase()
-                    $(displayVehiculo).next().text(string);                    
-                }
-            }
-        
-        }
-
-        const Messages = {
-            is_open: false,
-            client_NotFound_id: client_NotFound_id,
-
-            msg_ClientNotFound: function () {
-                if (this.is_open == false) {
-                    this.is_open = true;
-                    $(client_NotFound_id).fadeIn().delay(2000).fadeOut(function () {
-                        this.is_open = false;
-                    }.bind(this));
-                }
-            }
-        }
-        
-        
-        $(buscarCliente_btnId).click(function () {
-            const num_documento = $(buscarCliente_inputId).val()
-            const tipo_documento = $(tipo_documento_selectId).val()
-            
-            $.ajax({
-                url: window.location.href,
-                type: "POST",
-                data: JSON.stringify({ "num_documento": num_documento, "tipo_documento": tipo_documento }),
-                headers: {
-                    "X-Requested-Type": "buscar-cliente",
-                    "Content-Type": "application/json; charset=utf-8",
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                success: function (data) {
-                    if (data.length == 0) {
-                        Messages.msg_ClientNotFound()
-                        Transaccion.add_cliente({})
-                    } else {
-                        Transaccion.add_cliente(data[0])
-                    }
-                },
-            });
-        });
-        
-        $(buscarVehiculo_btnId).click(function () {
-            const id_tipo_vehiculo = $("#id_tipo_vehiculo").val()
-            const id_placa = $("#id_placa").val()
-            
-            $.ajax({
-                url: window.location.href,
-                type: "POST",
-                data: JSON.stringify({ "placa": id_placa, "tipo_vehiculo": id_tipo_vehiculo }),
-                headers: {
-                    "X-Requested-Type": "buscar-vehiculo",
-                    "Content-Type": "application/json; charset=utf-8",
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                success: function (data) {
-                    console.log(data)
-                },
-            });
-        });
-
-
-    });
-</script>
+<script src="{% static 'transactions/js/transaccion/transaccion.js' %}"></script>
 {% endblock content %}

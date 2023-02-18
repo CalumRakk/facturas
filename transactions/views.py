@@ -103,7 +103,7 @@ class Transaccion_view(View):
         
         elif "buscar-vehiculo" == request.headers.get("X-Requested-Type"):
             json_data = json.loads(request.body.decode("utf-8"))
-            fields=["tipo_vehiculo", "placa"]
+            fields=["tipo_vehiculo", "placa__icontains"]
             vehiculo= search_in_model(json_data, fields, Vehiculo)
             return JsonResponse(vehiculo, safe=False)
 
@@ -114,17 +114,27 @@ class Transaccion_view(View):
             
             cliente= checker(data, ClienteForm)        
             if isinstance(cliente, dict):
+                errors.update(cliente)        
+            
+            vehiculo= checker(data, VehiculoForm)        
+            if isinstance(vehiculo, dict):
                 errors.update(cliente)
             
+            # Comprueba si hay algun mensaje de error en el diccionario de errors.
             if len(errors.keys())  >0:  
                 errors.update({"status":"fail"})          
                 return JsonResponse(errors, safe=False)        
             
+            # Comprueba si alguna de las instancia de los modelos no tiene id, en ese caso se da por hecho que no existe en la database y se guarda en la database.
             if cliente.pk is None:
-                cliente.save()  
+                cliente.save() 
+            if vehiculo.pk is None:
+                vehiculo.save() 
+
+
         
             data["cliente"]=cliente
-            data["vehiculo"]= buscar_objeto(Vehiculo, data.get("vehiculo"))
+            data["vehiculo"]= vehiculo
             data["tramite"]= buscar_objeto(Tramite, data.get("tramite"))
             data["valor_total"]= "1"     
 

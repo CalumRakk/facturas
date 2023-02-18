@@ -5,23 +5,43 @@ from django.db.models import Model
 from typing import Union
 
 
-def search_in_model(data: dict, field_names: list, modelo: Model) -> list:
-    """La función busca un objeto en el modelo dado y devuelve un array.
+def search_in_model(data: dict, field_names: list, model: Model) -> list:
+    """La función busca un objeto en el modelo usando los campos y filtros dados y devuelve un array.
 
-    La función intenta buscar un objeto en el modelo de Django dato `modelo`,
-    utilizando los valores proporcionados en el json `data` y la lista de nombres de campos validos `field_name`.
+    La idea es que en el backend se especique los campos y los filtros permitidos para hacer la consulta en el modelo dado, y en el
+    frontend se debe especificar los mismo nombres de campos.
 
-    - field_names : es una lista de nombre de campos que deben existir en el json data y que se usará para filtrar la busqueda en el modelo.
+    - data : es un json que viene del frontend y debe contener los mismo nombres de campos especificados en `field_names`
+    - field_names : es una lista de nombres de campos que tiene la siguiente sintaxis: ["nombreDeCampo1__filtroDeDjango", "nombreDeCampo2"].
+    Un ejempo más real seria: ["tipo_vehiculo", "placa__icontains"] indica que se filtrarán los resultados usando los campos 'tipo_vehiculo' y 'placa' y 
+    el campo `placa` usa el filtro de consulta '__icontains' para no distinguir entre mayusculas y minuscula.
+
     """
-    filtro = {}
-    for keyname in field_names:
-        if data.get(keyname) is None:
-            return []
-        filtro.update({keyname: data.get(keyname)})
+    # Si los nombres de campos especificados en el backend y frontend no son los mismo se devuelve una lista vacia.
+    for field in field_names:        
+        if "__" in field:            
+            name= field.split("__")[0]
+        else:
+            name= field        
+        if data.get(name) is None:
+            return []  
+    
+    # Organiza los datos para que el filtro especificado en el backend se aplique en la consulta.
+    filter= {}
+    for field in field_names:        
+        if "__" in field:            
+            name= field.split("__")[0]
+            name_and_filter= field
+            value= data.get(name)            
+            filter.update({name_and_filter:value})
+            continue
+        value= data.get(field)
+        filter.update({field:value})
+    
     try:
-        queryset = modelo.objects.filter(**filtro)
+        queryset = model.objects.filter(**filter)
         return list(queryset.values())
-    except modelo.DoesNotExist:
+    except model.DoesNotExist:
         return []
 
 
