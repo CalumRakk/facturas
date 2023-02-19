@@ -68,15 +68,15 @@ def index(request):
 
 class Transaccion_view(View):
     def get(self, request):
-        tramite = TramiteForm()       
+        tramite = TramiteForm()
         cliente = ClienteForm()
-        vehiculo= VehiculoForm()
+        vehiculo = VehiculoForm()
         transaccion = TransaccionForm()
-        context={
-            "transaccion": transaccion, 
-            "tramite": tramite, 
+        context = {
+            "transaccion": transaccion,
+            "tramite": tramite,
             "cliente": cliente,
-            "vehiculo":vehiculo
+            "vehiculo": vehiculo
         }
         return render(request, 'dashboard/transaccion.html', context)
 
@@ -102,60 +102,66 @@ class Transaccion_view(View):
                         num_documento=num_documento, tipo_documento=tipo_documento)
                     return JsonResponse(list(clientes.values()), safe=False)
             return JsonResponse([], safe=False)
-        
+
         elif "buscar-vehiculo" == request.headers.get("X-Requested-Type"):
             json_data = json.loads(request.body.decode("utf-8"))
-            fields=["tipo_vehiculo", "placa__iexact"]
-            vehiculo= search_in_model(json_data, fields, Vehiculo)
+            fields = ["tipo_vehiculo", "placa__iexact"]
+            vehiculo = search_in_model(json_data, fields, Vehiculo)
             return JsonResponse(vehiculo, safe=False)
         elif "buscar-tramite" == request.headers.get("X-Requested-Type"):
             json_data = json.loads(request.body.decode("utf-8"))
-            fields=["registro", "nombre__icontains", "clasificacion"]
-            queryset= search_in_model(json_data, fields, Tramite, queryset=True)
-            tramies=[]
+            fields = ["registro", "nombre__icontains", "clasificacion"]
+            queryset = search_in_model(
+                json_data, fields, Tramite, queryset=True)
+            tramies = []
             for tramite in queryset:
-                derechos= tramite.derechos.values()                
+                derechos = tramite.derechos.values()
                 diccionario = model_to_dict(tramite)
-                diccionario["derechos"]= list(derechos)
+                diccionario["derechos"] = list(derechos)
                 tramies.append(diccionario)
             return JsonResponse(tramies, safe=False)
 
         elif "procesar-transaccion" == request.headers.get("X-Requested-Type"):
             # FIXME: añadir un limitar de cuantos transsaciones puede hacer un cliente.
-            errors={}
+            errors = {}
             data = json.loads(request.body)
-            
-            cliente= checker(data, ClienteForm)        
+
+            cliente = checker(data, ClienteForm)
             if isinstance(cliente, dict):
-                errors.update(cliente)        
-            
-            vehiculo= checker(data, VehiculoForm)        
-            if isinstance(vehiculo, dict):
                 errors.update(cliente)
-            
+
+            vehiculo = checker(data, VehiculoForm)
+            if isinstance(vehiculo, dict):
+                errors.update(vehiculo)
+
+            tramite = checker(data, TramiteForm, new_object=False)
+            if isinstance(tramite, dict):
+                errors.update(tramite)
+
             # Comprueba si hay algun mensaje de error en el diccionario de errors.
-            if len(errors.keys())  >0:  
-                errors.update({"status":"fail"})          
-                return JsonResponse(errors, safe=False)        
-            
+            if len(errors.keys()) > 0:
+                errors.update({"status": "fail"})
+                return JsonResponse(errors, safe=False)
+
             # Comprueba si alguna de las instancia de los modelos no tiene id, en ese caso se da por hecho que no existe en la database y se guarda en la database.
             if cliente.pk is None:
-                cliente.save() 
+                cliente.save()
             if vehiculo.pk is None:
-                vehiculo.save() 
+                vehiculo.save()
 
-
-        
-            data["cliente"]=cliente
-            data["vehiculo"]= vehiculo
-            data["tramite"]= buscar_objeto(Tramite, data.get("tramite"))
-            data["valor_total"]= "1"     
+            data["cliente"] = cliente
+            data["vehiculo"] = vehiculo
+            data["tramite"] = tramite
 
             transaction = TransaccionForm(data=data)
             if transaction.is_valid():
                 transaction.save()
-                return JsonResponse({"status":"ok","redirect_url": reverse("transactions:test")})
-            errors.update({"transaccion": transaction.errors.as_text(),"status":"fail"})
-            return JsonResponse(errors, safe=False)       
-            
-        return JsonResponse({'status':'false'}, status=400)
+                return JsonResponse({"status": "ok", "redirect_url": reverse("transactions:test")})
+
+            errors.update({
+                "transaccion": transaction.errors.as_text(),
+                "status": "fail"
+            })
+            return JsonResponse(errors, safe=False)
+
+        return JsonResponse({'status': 'false'}, status=400)

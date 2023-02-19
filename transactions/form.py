@@ -35,10 +35,4 @@ class TransaccionForm(forms.ModelForm):
     class Meta:
         model = Transaccion
         fields = '__all__'
-
-    def clean(self):
-        
-        cleaned_data = super().clean()
-        # mi_campo_valor = cleaned_data.get('mi_campo')
-        # cleaned_data['mi_campo'] = mi_campo_valor.upper()
-        return cleaned_data
+        exclude = ["estado", "valor_total"]

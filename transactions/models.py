@@ -96,8 +96,29 @@ class Tramite(models.Model):
     creado = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(default=timezone.now)
 
+    valor_total = models.DecimalField(
+        max_digits=10, decimal_places=0, blank=True, null=True
+    )
+
+    class Meta:
+        unique_together = ("nombre", "registro", "clasificacion", "vigencia")
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.valor_total = str(self.get_valor_total())
+    
+    def get_valor_total(self):
+        try:
+            tramite_derechos = self.tramitederecho_set.all()
+        except Exception as e:
+            return 0
+        if not tramite_derechos:
+            return 0
+        return sum(derecho.valor for derecho in tramite_derechos)
+
     def save(self, *args, **kwargs):
         self.nombre = self.nombre.upper()
+        self.valor_total = self.get_valor_total()
         super(Tramite, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -122,7 +143,6 @@ class Transaccion(models.Model):
         PAGADO = "PAGADO", "Pagado"
         CANCELADO = "CANCELADO", "Cancelado"
 
-
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
     tramite = models.ForeignKey(Tramite, on_delete=models.CASCADE)
@@ -136,11 +156,14 @@ class Transaccion(models.Model):
 
     def __str__(self):
         return f"{self.cliente} : {self.vehiculo} : {self.tramite} : {self.estado}"
-    
-    valor_total = models.DecimalField(max_digits=10, decimal_places=0, default=0.00) # No parece necesario tener este campo.
+
+    # No parece necesario tener este campo.
+    valor_total = models.DecimalField(
+        max_digits=10, decimal_places=0, default=0.00)
 
     def save(self, *args, **kwargs):
-        self.valor_total = self.tramite.tramitederecho_set.aggregate(Sum("valor"))["valor__sum"]
+        self.valor_total = self.tramite.tramitederecho_set.aggregate(Sum("valor"))[
+            "valor__sum"]
         super(Transaccion, self).save(*args, **kwargs)
 
     def get_absolute_url(self):

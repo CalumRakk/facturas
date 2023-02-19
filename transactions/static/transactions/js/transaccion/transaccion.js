@@ -17,6 +17,8 @@ $(function () {
     var filtro_tipo_vehiculo_idselect = "#id_tipo_vehiculo"
     var contenedor_VehiculoNotFound = "#contenedor_VehiculoNotFound"
 
+    var displayTramite = "#display-tramite";
+
     var procesarTransaccion_formId = "#procesarTransaccion"
 
     const form_to_object = (formJQuery) => {
@@ -95,13 +97,15 @@ $(function () {
                 const string = data.tipo_vehiculo + " - " + data.placa.toUpperCase()
                 $(displayVehiculo).next().text(string);
             }
-        }
-        add_tramites: function(data){
-            this.vehiculo = data
-            if ($.isEmptyObject(data) == false) {
-                const string = data.tipo_vehiculo + " - " + data.placa.toUpperCase()
-                $(displayVehiculo).next().text(string);
-            }
+        },
+        add_tramites: function (data) {
+            this.tramite = data
+           
+            const string = data.nombre
+            // $(displayTramite).next().text(string);
+            sibling = $(displayTramite).nextAll();
+            sibling[0].innerText = data.nombre
+            sibling[1].innerHTML = data.derechos_html         
         }
     }
 
@@ -122,6 +126,13 @@ $(function () {
                     this.is_open = false;
                 }.bind(this));
             }
+        },
+        msg_Tramite: function (msg) {
+            contenedor = $("#contenedor_tramite")
+            contenedor.find("p").text(msg)
+            contenedor.fadeIn().delay(2000).fadeOut(function () {
+                this.is_open = false;
+            }.bind(this));
         }
     }
 
@@ -175,26 +186,75 @@ $(function () {
     });
 
     $("#buscarTramite_btnId").click(function () {
-        const nombre= $("#id_nombre_tramite").val()
+        const nombre = $("#id_nombre_tramite").val()
         const registro = $("#id_registro").val()
         const clasificacion = $("#id_tipo_vehiculo").val() // TEMPORAL, SE DEBE CONFIRMAR SI SE HA AÑADIDO UN VEHICULO ANTES DE PERMITIR BUSCAR.
-        
+        if (("vehiculo" in Transaccion) == false || $.isEmptyObject(Transaccion.vehiculo)) {
+            Messages.msg_Tramite("Antes de buscar tramites, vincula un vehiculo a la transacción.")
+            return
+        }
+
         $.ajax({
             url: window.location.href,
             type: "POST",
-            data: JSON.stringify({"nombre":nombre, "registro": registro, "clasificacion": clasificacion }),
+            data: JSON.stringify({ "nombre": nombre, "registro": registro, "clasificacion": clasificacion }),
             headers: {
                 "X-Requested-Type": "buscar-tramite",
                 "Content-Type": "application/json; charset=utf-8",
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             },
             success: function (data) {
+                $("table tbody").empty();
                 if (data.length == 0) {
-                    Messages.msg_TramiteNotFound()
-                    Transaccion.add_tramites([])
-                } else {
-                    Transaccion.add_tramites(data[0])
+                    Messages.msg_Tramite("No se encontro ningun tramite.")
+                    return
                 }
+
+                $.each(data, function (index, element) {
+                    
+                    const row = $(`<tr id='${element.id}'>`);                   
+        
+                    const col_nombre = $("<td class='tramite-nombre'>").text(element.nombre);
+                    const col_registro = $("<td class='tramite-registro'>").text(element.registro);
+                    const col_clasificacion = $("<td class='tramite-clasificacion'>").text(element.clasificacion);                   
+
+                    const col_derechos = $("<td class='tramite-derechos'>");                
+                    for (var index = 0; index < element.derechos.length; index++) {                        
+                        const div= $("<div>").text(element.derechos[index].nombre)
+                        col_derechos.append(div)
+                    }                 
+                    const col_valor_total = $("<td class='tramite-valor_total'>").text(element.valor_total);                    
+                    const button= $("<button class='vincular-fila'>").text("Vincular")
+                    const col_option= $("<td>").append(button)
+                    row.append(col_nombre);
+                    row.append(col_registro);
+                    row.append(col_clasificacion);
+                    row.append(col_derechos);
+                    row.append(col_valor_total);
+                    row.append(col_option);
+
+                    $("table").append(row);
+
+                    if (index === data.length - 1) {
+                        vincularBtns = $(".vincular-fila");
+                        vincularBtns.click(function () {
+                            var tr_element = $(this).closest('tr')
+                            const id = tr_element.attr("id")
+                            const nombre = tr_element.find(".tramite-nombre").text()
+                            const clasificacion = tr_element.find(".tramite-clasificacion").text()
+                            const derechos_html = tr_element.find(".tramite-derechos").html()
+                            const valor_total = tr_element.find(".tramite-valor_total").text()
+                            Transaccion.add_tramites({
+                                id:id,
+                                nombre:nombre,
+                                clasificacion:clasificacion,
+                                derechos_html:derechos_html,
+                                valor_total:valor_total
+                            })
+                        });
+                    }
+                });
+
             },
         });
     });

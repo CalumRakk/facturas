@@ -9,9 +9,9 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <style>
-    .container {
+    /* .container {
         max-width: 1080px;
-    }
+    } */
 
     .border-top {
         border-top: 1px solid #e5e5e5;
@@ -81,32 +81,30 @@
 
                     <ul class="list-group mb-3">
 
-                        <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Cliente -->
+                        <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Cliente Display -->
                             <div>
                                 <h6 class="my-0" id="display-cliente">Cliente</h6>
                                 <small class="form-control-plaintext text-muted">Sin asignar</small>
                                 <small class="form-control-plaintext text-muted"></small>
                             </div>
-                        </li><!-- Fin Cliente -->
+                        </li><!-- Fin Cliente Display-->
 
-                        <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Registro -->
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <!-- Vehiculo Display -->
                             <div>
-                                <h6 class="my-0" id="display-vehiculo"> Vehiculo</h6>
+                                <h6 class="my-0" id="display-vehiculo">Vehiculo</h6>
                                 <small class="form-control-plaintext text-muted">Sin asignar</small>
                                 <small class="form-control-plaintext text-muted"></small>
                             </div>
-                        </li><!-- Fin Registro -->
-<!-- 
-                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        </li><!-- Fin Vehiculo Display-->
+
+                        <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Tramite Display -->
                             <div>
-                                {{ transaccion.estado }}
+                                <h6 class="my-0" id="display-tramite">Tramite</h6>
+                                <small class="form-control-plaintext text-muted">Sin asignar</small>
+                                <small class="form-control-plaintext text-muted"></small>
                             </div>
-                        </li>    
-                        <li class="list-group-item d-flex justify-content-between lh-condensed">
-                            <div>
-                                {{ transaccion.valor_total }}
-                            </div>
-                        </li> -->
+                        </li><!-- Fin Tramite Display-->
                     </ul>
                     <button class="btn btn-primary btn-lg btn-block" type="submit">Procesar</button>
                 </form>
@@ -224,40 +222,27 @@
                                         class="bi bi-search"></i>Buscar</button>
                             </div>
                         </div>
-                        <div id="contenedor_VehiculoNotFound" class="message-container">
-                            <p>Vehiculo no encontrado.</p>
+                        <div id="contenedor_tramite" class="message-container">
+                            <p></p>
                         </div>
                     </form>
                 </div>
-                <div class="row">
-                    <table class="table">
-                        <thead>
-                          <tr>
-                            <th>Firstname</th>
-                            <th>Lastname</th>
-                            <th>Email</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>John</td>
-                            <td>Doe</td>
-                            <td>john@example.com</td>
-                          </tr>
-                          <tr>
-                            <td>Mary</td>
-                            <td>Moe</td>
-                            <td>mary@example.com</td>
-                          </tr>
-                          <tr>
-                            <td>July</td>
-                            <td>Dooley</td>
-                            <td>july@example.com</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                <div class="row">                    
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Registro</th>
+                                    <th>Clasificación</th>
+                                    <th>Derechos</th>
+                                    <th>Valor Total</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>                   
                 </div>
-
             </div>
         </div>
     </div>
