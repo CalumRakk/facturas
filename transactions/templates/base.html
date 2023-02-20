@@ -16,11 +16,11 @@
 
   <!-- Vendor CSS Files -->
 
-  <link href="{% static 'invoice/lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-  <link href="{% static 'invoice/lib/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'transactions/lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'transactions/lib/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-   <link href="{% static 'invoice/css/index-style.css' %}" rel="stylesheet">
+   <link href="{% static 'transactions/css/index-style.css' %}" rel="stylesheet">
 
   <style>
     .getsignin {
@@ -41,8 +41,6 @@
 
       <div class="logo">
         <h1 class="text-light"><a href="/"><span>Fakturo</span></a></h1>
-        <!-- Uncomment below if you prefer to use an image logo -->
-        <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
       </div>
 
       <nav id="navbar" class="navbar">
@@ -53,10 +51,10 @@
           <li><a class="nav-link scrollto" href="#">Contact</a></li>
 
           {% if user.is_authenticated %}
-            <li><a class="getstarted scrollto" href="{% url 'invoice:dashboard' %}">Dashboard</a></li>
+            <li><a class="getstarted scrollto" href="{% url 'transactions:dashboard' %}">Dashboard</a></li>
           {% else %}
-            <li><a class="getstarted scrollto" href="{% url 'invoice:signup' %}">Get Started</a></li>
-            <li><a class="bi getsignin" href="{% url 'invoice:signin' %}">Login</a></li>
+            <li><a class="getstarted scrollto" href="{% url 'transactions:signup' %}">Get Started</a></li>
+            <li><a class="bi getsignin" href="{% url 'transactions:signin' %}">Login</a></li>
           {% endif %}
 
          
@@ -67,28 +65,10 @@
     </div>
   </header><!-- End Header -->
 
-  <!-- ======= Hero Section ======= -->
-  <section id="hero" class="d-flex align-items-center">
-
-    <div class="container">
-      <div class="row gy-4">
-        <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
-          <h1>Fakturo donde la gestión de facturación es más fácil y eficiente</h1>
-          <h2>soluciones integrales de facturación y control financiero.</h2>
-          <div>
-            <a href="{% url 'invoice:signup' %}" class="btn-get-started scrollto">Get Started</a>
-          </div>
-        </div>
-        <div class="col-lg-6 order-1 order-lg-2 hero-img">
-          <img src="{% static 'invoice/img/hero-img.svg' %}" class="img-fluid animated" alt="">
-        </div>
-      </div>
-    </div>
-
-  </section><!-- End Hero -->
-
   <main id="main">
+    {% block content %}
 
+    {% endblock content%}
   </main><!-- End #main -->
 
   

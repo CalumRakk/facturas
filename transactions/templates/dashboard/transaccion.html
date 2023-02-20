@@ -1,0 +1,257 @@
+{% extends "dashboard/base.html" %}
+
+{% load static %}
+
+
+
+{% block head %}
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<style>
+    /* .container {
+        max-width: 1080px;
+    } */
+
+    .border-top {
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .border-bottom {
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .border-top-gray {
+        border-top-color: #adb5bd;
+    }
+
+    .box-shadow {
+        box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+    }
+
+    .lh-condensed {
+        line-height: 1.25;
+    }
+
+    .message-container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        /* width: 200px; */
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        padding: 10px;
+        display: none;
+    }
+
+    .message {
+        margin: 0;
+        color: red;
+    }
+
+    .caja {
+        position: relative;
+    }
+</style>
+{% endblock head %}
+
+{% block content %}
+
+<main id="main" class="main">
+    <!-- Page Title -->
+    <div class="pagetitle">
+        <h1>Dashboard</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'transactions:dashboard' %}">Home</a></li>
+                <li class="breadcrumb-item active">Clientes</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 order-md-2 mb-4"><!-- Seccion de Transacción -->
+
+                <form method="post" id="procesarTransaccion">
+                    {% csrf_token %}
+                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Tu Transacción</span>
+                        <span class="badge badge-secondary badge-pill">3</span>
+                    </h4>
+
+                    <ul class="list-group mb-3">
+
+                        <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Cliente Display -->
+                            <div>
+                                <h6 class="my-0" id="display-cliente">Cliente</h6>
+                                <small class="form-control-plaintext text-muted">Sin asignar</small>
+                                <small class="form-control-plaintext text-muted"></small>
+                            </div>
+                        </li><!-- Fin Cliente Display-->
+
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <!-- Vehiculo Display -->
+                            <div>
+                                <h6 class="my-0" id="display-vehiculo">Vehiculo</h6>
+                                <small class="form-control-plaintext text-muted">Sin asignar</small>
+                                <small class="form-control-plaintext text-muted"></small>
+                            </div>
+                        </li><!-- Fin Vehiculo Display-->
+
+                        <li class="list-group-item d-flex justify-content-between lh-condensed"><!-- Tramite Display -->
+                            <div>
+                                <h6 class="my-0" id="display-tramite">Tramite</h6>
+                                <small class="form-control-plaintext text-muted">Sin asignar</small>
+                                <small class="form-control-plaintext text-muted"></small>
+                            </div>
+                        </li><!-- Fin Tramite Display-->
+                    </ul>
+                    <button class="btn btn-primary btn-lg btn-block" type="submit">Procesar</button>
+                </form>
+            </div><!-- Final Seccion de Transacción -->
+
+
+            <div class="col-md-8 order-md-1">
+                <h4 class="mb-3">Cliente</h4>
+                <div id="acordeon-cliente">
+                    <div class="card">
+                        <div class="card-header" id="headingTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+                                    aria-expanded="false" aria-controls="collapseTwo">
+                                    añadir Cliente existente
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo"
+                            data-parent="#acordeon-cliente">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div>{{ cliente.tipo_documento.label }}
+
+                                        {{ cliente.tipo_documento }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <input class="form-control" type="search" id="buscar-cliente-input" name="query"
+                                            placeholder="N.documento " title="Buscar Cliente">
+                                        <div id="client_NotFound_id" class="message-container">
+                                            <p>Cliente no encontrado.</p>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <button class="btn btn-secondary" title="Search" id="buscar-cliente-button"><i
+                                                class="bi bi-search"></i>Buscar y añadir</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                    Registrar nuevo Cliente
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne"
+                            data-parent="#acordeon-cliente">
+                            <div class="card-body">
+                                <form id="form-crear-cliente">
+                                    {{ cliente.as_p }}
+                                    <button class="btn btn-success">crear</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="mb-4">
+
+                <div class="caja">
+                    <h4 class="mb-3">Vehiculo</h4>
+
+                    <form id="crear-vehiculo-form" style="position: static;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ vehiculo.tipo_vehiculo.label }}
+                                {{ vehiculo.tipo_vehiculo }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <!-- <input class="form-control" type="text" id="buscar-vehiculo-input" placeholder="N. Placa "> -->
+                                {{ vehiculo.placa }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <button type="button" class="btn btn-secondary" id="buscar-vehiculo-button"><i
+                                        class="bi bi-search"></i>Buscar
+                                    y añadir</button>
+                                <button type="submit" class="btn btn-success"></i>Crear</button>
+                            </div>
+
+                        </div>
+                        <div id="contenedor_VehiculoNotFound" class="message-container">
+                            <p>Vehiculo no encontrado.</p>
+                        </div>
+                    </form>
+                </div>
+
+                <hr class="mb-4">
+                <div class="caja">
+                    <h4 class="mb-3">Tramite</h4>
+                    <form id="crear-vehiculo-form" style="position: static;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ tramite.registro.label }}
+                                {{ tramite.registro }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <!-- <input class="form-control" type="text" id="id_nombre" placeholder="nombre del tramite."> -->
+                                {{ tramite.nombre }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <button type="button" class="btn btn-secondary" id="buscarTramite_btnId"><i
+                                        class="bi bi-search"></i>Buscar</button>
+                            </div>
+                        </div>
+                        <div id="contenedor_tramite" class="message-container">
+                            <p></p>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">                    
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Registro</th>
+                                    <th>Clasificación</th>
+                                    <th>Derechos</th>
+                                    <th>Valor Total</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>                   
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="{% static 'transactions/js/transaccion/transaccion.js' %}"></script>
+{% endblock content %}

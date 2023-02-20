@@ -7,8 +7,8 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
   <title>Fakturo</title>
-  <link href="{% static 'invoice/img/favicon.png' %}" rel="icon">
-  <link href="{% static 'invoice/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+  <link href="{% static 'transactions/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'transactions/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -17,10 +17,10 @@
     rel="stylesheet">
 
   <!-- CSS -->
-  <link href="{% static 'invoice/lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-  <link href="{% static 'invoice/lib/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'transactions/lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'transactions/lib/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
 
-  <link href="{% static 'invoice/css/style.css' %}" rel="stylesheet">
+  <link href="{% static 'transactions/css/style.css' %}" rel="stylesheet">
 
   {% block head %}
   {% endblock head %}
@@ -34,32 +34,25 @@
 
     <ul class="sidebar-nav">
       <li class="nav-item">
-        <a class="nav-link " href="{% url 'invoice:dashboard' %}">
+        <a class="nav-link " href="{% url 'transactions:dashboard' %}">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
       </li><!-- End Dashboard Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" href="{% url 'invoice:client-detail' %}">
+      {% comment %} <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#components-nav" href="{% url 'transactions:tramite' %}">
           <i class="bi bi-menu-button-wide"></i>
-          <span>Clientes</span>
+          <span>Crear Tramite</span>
         </a>
-      </li><!-- End Components Nav -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" href="#">
-          <i class="bi bi-menu-button-wide"></i>
-          <span>Products</span>
-        </a>
-      </li><!-- End Components Nav -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" href="#">
-          <i class="bi bi-menu-button-wide"></i>
-          <span>Facturas</span>
-        </a>
-      </li><!-- End Components Nav -->
+      </li><!-- End Components Nav --> {% endcomment %}
 
-
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#components-nav" href="{% url 'transactions:transaccion' %}">
+          <i class="bi bi-menu-button-wide"></i>
+          <span>Transacción</span>
+        </a>
+      </li><!-- End Components Nav -->
 
       <li class="nav-heading">Pages</li>
 
@@ -88,7 +81,7 @@
 
     <div class="d-flex align-items-center justify-content-between">
       <a href="/" class="logo d-flex align-items-center">
-        <img src="{% static 'invoice/img/logo.png' %}" alt="">
+        <img src="{% static 'transactions/img/logo.png' %}" alt="">
         <span class="d-none d-lg-block">Fakturo</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -106,7 +99,7 @@
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="{% static 'invoice/img/logo.png' %}" alt="Profile" class="rounded-circle">
+            <img src="{% static 'transactions/img/logo.png' %}" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2">{{ user.username }}</span>
           </a><!-- End Profile Iamge Icon -->
 
@@ -130,7 +123,7 @@
             </li>
 
             <li>
-              <a class="dropdown-item d-flex align-items-center" href="{% url 'invoice:signout' %}">
+              <a class="dropdown-item d-flex align-items-center" href="{% url 'transactions:signout' %}">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Sign Out</span>
               </a>
@@ -145,20 +138,13 @@
   </header><!-- End Header -->
 
   {% block content %}
-
   {% endblock content %}
 
-  <!-- Vendor JS Files -->
-  <!-- Script -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script> 
-  <script src="{% static 'invoice/lib/bootstrap/js/bootstrap.min.js' %}"></script>
-  <script src="{% static 'invoice/lib/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-  <!-- Template Main JS File -->
-  <script src="{% static 'invoice/js/main.js' %}"></script>
-
-
-  {% block script %}
+  {% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>  {% endcomment %}
+  {% comment %} <script src="{% static 'transactions/lib/bootstrap/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'transactions/lib/bootstrap/js/bootstrap.bundle.min.js' %}"></script> {% endcomment %}
   
+  {% block script %}  
   {% endblock script %}
 </body>
 
